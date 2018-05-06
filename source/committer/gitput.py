@@ -46,7 +46,7 @@ class GitControl:
 		return self.run_command_shell('git commit -m "{}"'.format(message))
 
 	def push(self, branch):
-		self.logger.info("Pushing to {}".format(branch))
+		self.logger.info("Pushing to origin/{}".format(branch))
 		return self.run_command_shell('git push -u origin {}'.format(branch))
 
 	def writeData(self):
@@ -59,20 +59,23 @@ class GitControl:
 			data = json.loads(file.read())
 		return data
 
-	def update(self):
+	def commitFiles(self):
 
 		# ignored in repo for security reasons
 		settings = self.loadJson('git.json')
 
-		url = 'https://{}:{}@github.com/{}/{}'.format(
-			settings['committer'],
-			'"{}"'.format(settings['password']),
+		gitUrl = 'github.com/{}/{}'.format(
 			settings['user'],
 			settings['repository']
 		)
+		url = 'https://{}:{}@{}'.format(
+			settings['committer'],
+			'{}'.format(settings['password']),
+			gitUrl
+		)
 
 		dirRoot = os.getcwd()
-		dirFullPath = os.path.join(dirRoot, settings['directory'])
+		dirFullPath = os.path.join(dirRoot, settings['directory'].replace('/', '\\'))
 
 		self.clonePull(url, settings['branch'], dirFullPath)
 
@@ -84,4 +87,9 @@ class GitControl:
 
 		os.chdir(dirRoot)
 
-GitControl(logger).update()
+		commitSha = self.run_command_shell_response('git rev-parse --verify HEAD')
+		commitUrl = '{}/blob/{}'.format(gitUrl, commitSha)
+
+		return commitUrl
+
+logger.info(GitControl(logger).commitFiles())
