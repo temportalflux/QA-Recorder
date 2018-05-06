@@ -33,7 +33,7 @@ class GitControl:
 			result = self.run_command_shell("git pull")
 		else:
 			self.logger.info("Cloning {}/{} to {}".format(url, branch, dirFullPath))
-			result = self.run_command_shell('git clone -b {} "{}" "{}"'.format(branch, url, dirFullPath))
+			result = self.run_command_shell('git clone -b {} "{}" {}'.format(branch, url, dirFullPath))
 			os.chdir(dirFullPath)
 		return result
 
@@ -85,10 +85,10 @@ class GitControl:
 		self.commit('add footage')
 		self.push(settings['branch'])
 
-		os.chdir(dirRoot)
-
 		commitSha = self.run_command_shell_response('git rev-parse --verify HEAD')
 		commitUrl = '{}/blob/{}'.format(gitUrl, commitSha)
+
+		os.chdir(dirRoot)
 
 		return commitUrl
 
