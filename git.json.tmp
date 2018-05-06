@@ -1,0 +1,8 @@
+{
+	"committer": "temportalflux",
+	"password": "<my super secret password>",
+	"user": "temportalflux",
+	"repository": "QA-Recorder",
+	"branch": "recordings",
+	"directory": "recordings/"
+}
