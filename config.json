@@ -1,0 +1,56 @@
+{
+	"obs":
+	{
+		"executable":
+		{
+			"64":
+			{
+				"start-dir": {
+					"absolute": false,
+					"path": "resources/obs/bin/64bit/"
+				},
+				"exe": "obs64.exe"
+			},
+			"32": 
+			{
+				"start-dir": {
+					"absolute": false,
+					"path": "resources/obs/bin/32bit/"
+				},
+				"exe": "obs32.exe"
+			}
+		},
+		"settings":
+		{
+			"recording": true,
+			"streaming": false,
+			"stream":
+			{
+				"server": "",
+				"key": "",
+				"authentiation":
+				{
+					"enabled": false,
+					"username": "",
+					"password": ""
+				}
+			},
+			"output-path": "D:\\Desktop\\OBSPython\\resources\\recordings",
+			"profile": "resources/profiles/QA",
+			"scene-collection": "resources/scene-collections/QA.json",
+			"scene": "Scene"
+		}
+	},
+	"target":
+	{
+		"name": "Skyrates",
+		"32": 
+		{
+			"start-dir": {
+				"absolute": false,
+				"path": "resources/Skyrates-0.2.10/"
+			},
+			"exe": "Skyrates-0.2.10.exe"
+		}
+	}
+}
