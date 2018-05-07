@@ -92,4 +92,5 @@ class GitControl:
 
 		return commitUrl
 
-logger.info(GitControl(logger).commitFiles())
+def runCommitter():
+	logger.info(GitControl(logger).commitFiles())

@@ -35,7 +35,7 @@
 					"password": ""
 				}
 			},
-			"output-path": "D:\\Desktop\\OBSPython\\resources\\recordings",
+			"output-path": "D:\\Desktop\\OBSPython\\recordings",
 			"profile": "resources/profiles/QA",
 			"scene-collection": "resources/scene-collections/QA.json",
 			"scene": "Scene"

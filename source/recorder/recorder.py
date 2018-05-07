@@ -7,10 +7,9 @@ import argparse
 import subprocess
 import obswsrc
 
-from taskManager import TaskManager
-from obs import OBS
-import obsControl
-from applicationController import ApplicationController
+from recorder.taskManager import TaskManager
+from recorder.obsControl import OBSControl
+from recorder.applicationController import ApplicationController
 
 #def moveToHome():
 #	home = os.path.dirname(os.path.realpath(__file__))
@@ -23,7 +22,7 @@ def loadJson(filePath):
 		data = json.loads(file.read())
 	return data
 
-class TODORenameMain:
+class Recorder:
 
 	def __init__(self):
 		self.logger = logging.getLogger('')
@@ -31,7 +30,7 @@ class TODORenameMain:
 		self.config = loadJson("config.json")
 		self.taskManager = TaskManager(self.logger)
 
-		self.obs = OBS(self.logger, self.config["obs"]["executable"])
+		self.obs = ApplicationController(self.logger, 'OBS Studio', self.config["obs"]["executable"])
 		self.targetApplication = self.createTargetApplication()
 
 	def run(self):
@@ -45,7 +44,7 @@ class TODORenameMain:
 
 		async with obswsrc.OBSWS('localhost', 4444, "password") as obsws:
 			
-			controller = obsControl.OBSControl(self.logger, obsws)
+			controller = OBSControl(self.logger, obsws)
 
 			await controller.setup(self.config["obs"]["settings"])
 
@@ -71,11 +70,11 @@ class TODORenameMain:
 		targetAppSettings = self.config['target']
 		return ApplicationController(self.logger, targetAppSettings['name'], targetAppSettings)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(levelname)7s: %(message)s',
-    stream=sys.stderr,
-)
-main = TODORenameMain()
-main.run()
-input("Press Enter to continue...")
+def runRecorder():
+	logging.basicConfig(
+		level=logging.INFO,
+		format='%(levelname)7s: %(message)s',
+		stream=sys.stderr,
+	)
+	Recorder().run()
+	input("Press Enter to continue...")
