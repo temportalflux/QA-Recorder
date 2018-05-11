@@ -12,3 +12,5 @@ pip install aiodns
 pip install SIP
 pip install PyQt5
 pip install python-vlc
+
+pip install pyinstaller
