@@ -1,19 +1,39 @@
+#! /usr/bin/python
 
+#
+# Qt example for VLC Python bindings
+# Copyright (C) 2009-2010 the VideoLAN team
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+#
+
+from PyQt5.QtCore import *
+from PyQt5.QtMultimedia import *
+from PyQt5.QtMultimediaWidgets import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 import sys
 import os.path
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QPalette, QColor
-from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QSlider, QHBoxLayout, QPushButton, \
-	QVBoxLayout, QAction, QFileDialog, QApplication
 import vlc
 
-class Player(QMainWindow):
-	"""A simple Media Player using VLC and Qt
-	"""
-	def __init__(self, master=None):
-		QMainWindow.__init__(self, master)
-		self.setWindowTitle("Media Player")
+class VideoPlayer(QWidget):
+
+	def __init__(self, parent=None):
+		super(VideoPlayer, self).__init__(parent)
 
 		# creating a basic vlc instance
 		self.instance = vlc.Instance()
@@ -23,11 +43,11 @@ class Player(QMainWindow):
 		self.createUI()
 		self.isPaused = False
 
+		self.setMinimumHeight(400)
+
 	def createUI(self):
 		"""Set up the user interface, signals & slots
 		"""
-		self.widget = QWidget(self)
-		self.setCentralWidget(self.widget)
 
 		# In this widget, the video will be drawn
 		if sys.platform == "darwin": # for MacOS
@@ -35,9 +55,10 @@ class Player(QMainWindow):
 			self.videoframe = QMacCocoaViewContainer(0)
 		else:
 			self.videoframe = QFrame()
+
 		self.palette = self.videoframe.palette()
 		self.palette.setColor (QPalette.Window,
-							   QColor(0,0,0))
+								QColor(0,0,0))
 		self.videoframe.setPalette(self.palette)
 		self.videoframe.setAutoFillBackground(True)
 
@@ -68,17 +89,17 @@ class Player(QMainWindow):
 		self.vboxlayout.addWidget(self.positionslider)
 		self.vboxlayout.addLayout(self.hbuttonbox)
 
-		self.widget.setLayout(self.vboxlayout)
+		self.setLayout(self.vboxlayout)
 
-		open = QAction("&Open", self)
-		open.triggered.connect(self.OpenFile)
-		exit = QAction("&Exit", self)
-		exit.triggered.connect(sys.exit)
-		menubar = self.menuBar()
-		filemenu = menubar.addMenu("&File")
-		filemenu.addAction(open)
-		filemenu.addSeparator()
-		filemenu.addAction(exit)
+		#open = QAction("&Open", self)
+		#open.triggered.connect(self.OpenFile)
+		#exit = QAction("&Exit", self)
+		#exit.triggered.connect(sys.exit)
+		#menubar = self.menuBar()
+		#filemenu = menubar.addMenu("&File")
+		#filemenu.addAction(open)
+		#filemenu.addSeparator()
+		#filemenu.addAction(exit)
 
 		self.timer = QTimer(self)
 		self.timer.setInterval(200)
@@ -93,7 +114,7 @@ class Player(QMainWindow):
 			self.isPaused = True
 		else:
 			if self.mediaplayer.play() == -1:
-				self.OpenFile()
+				#self.OpenFile()
 				return
 			self.mediaplayer.play()
 			self.playbutton.setText("Pause")
@@ -123,8 +144,6 @@ class Player(QMainWindow):
 
 		# parse the metadata of the file
 		self.media.parse()
-		# set the title of the track as window title
-		self.setWindowTitle(self.media.get_meta(0))
 
 		# the media player has to be 'connected' to the QFrame
 		# (otherwise a video would be displayed in it's own window)
@@ -137,8 +156,7 @@ class Player(QMainWindow):
 			self.mediaplayer.set_hwnd(self.videoframe.winId())
 		elif sys.platform == "darwin": # for MacOS
 			self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
-		self.PlayPause()
-
+		
 	def setVolume(self, Volume):
 		"""Set the volume
 		"""
@@ -167,12 +185,3 @@ class Player(QMainWindow):
 				# "Pause", not the desired behavior of a media player
 				# this will fix it
 				self.Stop()
-
-if __name__ == "__main__":
-	app = QApplication(sys.argv)
-	player = Player()
-	player.show()
-	player.resize(640, 480)
-	if sys.argv[1:]:
-		player.OpenFile(sys.argv[1])
-	sys.exit(app.exec_())

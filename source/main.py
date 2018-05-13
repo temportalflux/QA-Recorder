@@ -10,12 +10,13 @@ from PyQt5.QtMultimediaWidgets import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from lib.struct import Struct
+from recorder.tabRecord import Tab as TabRecord
+from viewer.tabViewer import Tab as TabView
 import vlc
 
 # http://doc.qt.io/qt-5/qmainwindow.html
 # http://zetcode.com/gui/pyqt5/firstprograms/
-
-class Struct(object): pass
 
 class VideoViewer(QMainWindow):
 	
@@ -33,17 +34,9 @@ class VideoViewer(QMainWindow):
 			self.resources[key] = os.path.join(self.resourcesDir, value)
 		
 	def initUI(self):
-		self.initVLC()
 		self.initQt()
 		self.initWindow()
 		self.show()
-
-	def initVLC(self):
-		# creating a basic vlc instance
-		self.instance = vlc.Instance()
-		# creating an empty vlc media player
-		self.vlcPlayer = self.instance.media_player_new()
-		self.vlcPlayer.audio_set_volume(100)
 
 	def initQt(self):
 		QToolTip.setFont(QFont('SansSerif', 10))
@@ -52,105 +45,56 @@ class VideoViewer(QMainWindow):
 		# icon
 		self.setWindowIcon(QIcon(self.resources['icon']))
 		# title
-		self.setWindowTitle('QA Video Player')
+		self.setWindowTitle('QA Viewer')
 
-		self.initActions()
-		w,h = self.initContent()
+		#self.initActions()
+		w, h = self.initContent()
 
 		# position/location
 		self.resize(w, h)
 		self.centerWindow()
 
-	def initActions(self):
-		self.actions = Struct()
+	#def initActions(self):
+	#	self.actions = Struct()
 
-		self.actions.exit = QAction(QIcon('exit.png'), '&Exit', self)
-		self.actions.exit.setShortcut('Ctrl+Q')
-		self.actions.exit.setStatusTip('Exit application')
-		self.actions.exit.triggered.connect(qApp.quit)
+		#self.actions.exit = QAction(QIcon('exit.png'), '&Exit', self)
+		#self.actions.exit.setShortcut('Ctrl+Q')
+		#self.actions.exit.setStatusTip('Exit application')
+		#self.actions.exit.triggered.connect(qApp.quit)
 
-		self.actions.open = QAction(QIcon('open.png'), '&Open', self)
-		self.actions.open.setShortcut('Ctrl+O')
-		self.actions.open.setStatusTip('Open Data')
-		self.actions.open.triggered.connect(self.openData)
+		#self.actions.open = QAction(QIcon('open.png'), '&Open', self)
+		#self.actions.open.setShortcut('Ctrl+O')
+		#self.actions.open.setStatusTip('Open Data')
+		#self.actions.open.triggered.connect(self.openData)
 
 	def initContent(self):
 
 		# Create a widget for window contents
-		self.contentWidget = QWidget(self)
-		self.setCentralWidget(self.contentWidget)
+		#self.contentWidget = QWidget(self)
+		#self.setCentralWidget(self.contentWidget)
+		tabs = self.initWindowTabs()
+		self.setCentralWidget(tabs)
 
-		# In this widget, the video will be drawn
-		self.videoframe = QFrame()
-		self.palette = self.videoframe.palette()
-		self.palette.setColor(
-			QPalette.Window,
-			QColor(0,0,0)
-		)
-		self.videoframe.setPalette(self.palette)
-		self.videoframe.setAutoFillBackground(True)
-
-		self.buttons = Struct()
+		#self.buttons = Struct()
 		#self.buttons.play = QPushButton()
 		#self.buttons.play.setEnabled(False)
 		#self.buttons.play.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
 		#self.buttons.play.clicked.connect(self.play)
 
-		self.vboxlayout = QVBoxLayout()
-		self.vboxlayout.addWidget(self.videoframe)
-		#self.vboxlayout.addWidget(self.positionslider)
-		#self.vboxlayout.addLayout(self.hbuttonbox)
-
-		self.contentWidget.setLayout(self.vboxlayout)
-
-		menubar = self.menuBar()
-		self.menus = Struct()
-		self.menus.file = menubar.addMenu('&File')
-		self.menus.file.addAction(self.actions.open)
-		self.menus.file.addSeparator()
-		self.menus.file.addAction(self.actions.exit)
-
-		# https://pythonprogramminglanguage.com/pyqt5-video-widget/
-		# https://www.youtube.com/watch?v=tGKmQy-VBX0
-		# https://www.youtube.com/watch?v=PutunNtVpto
-		#videoPlayer = QMediaPlayer()
-		# https://pythonprogramminglanguage.com/pyqt5-video-widget/
-		#self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
-#
-		#self.videoWidget = QVideoWidget()
-#
-		#self.positionSlider = QSlider(Qt.Horizontal)
-		#self.positionSlider.setRange(0, 0)
-		#self.positionSlider.sliderMoved.connect(self.setPosition)
-#
-		#self.errorLabel = QLabel()
-		#self.errorLabel.setSizePolicy(
-		#	QSizePolicy.Preferred, QSizePolicy.Maximum
-		#)
-
-		# Create layouts to place inside widget
-		#controlLayout = QHBoxLayout()
-		#controlLayout.setContentsMargins(0, 0, 0, 0)
-		#controlLayout.addWidget(self.playButton)
-		#controlLayout.addWidget(self.positionSlider)
-
-		#layout = QVBoxLayout()
-		#layout.addWidget(self.videoWidget)
-		#layout.addLayout(controlLayout)
-		#layout.addWidget(self.errorLabel)
-
-		# Set widget to contain window contents
-		#wid.setLayout(layout)
-
-		#self.mediaPlayer.setVideoOutput(self.videoWidget)
-		#self.mediaPlayer.stateChanged.connect(self.mediaStateChanged)
-		#self.mediaPlayer.positionChanged.connect(self.positionChanged)
-		#self.mediaPlayer.durationChanged.connect(self.durationChanged)
-		#self.mediaPlayer.error.connect(self.handleError)
-
 		#self.statusBar().showMessage('Ready')
 
 		return (600, 400)
+
+	def initWindowTabs(self):
+		tabs = QTabWidget()
+		
+		#record = TabRecord()
+		#tabs.addTab(record, record.tabLabel)
+		
+		view = TabView()
+		tabs.addTab(view, view.tabLabel)
+
+		return tabs
 
 	def centerWindow(self):
 		qr = self.frameGeometry()
