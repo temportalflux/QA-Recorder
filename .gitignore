@@ -101,6 +101,6 @@ ENV/
 .mypy_cache/
 resources/zips/
 resources/obs/
-resources/Skyrates*
+Skyrates*
 git.json
 recordings/
