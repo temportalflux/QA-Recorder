@@ -9,6 +9,8 @@ from PyQt5.QtGui import *
 from util.browseBar import Browse
 from viewer.videoPlayer import VideoPlayer
 import os
+import logging
+from viewer.commentArea import CommentArea
 
 class Tab(QWidget):
 
@@ -19,25 +21,29 @@ class Tab(QWidget):
 		self.initContent()
 
 	def initContent(self):
-		layout = QVBoxLayout()
+		layout = QHBoxLayout()
 
-		layout.addWidget(self.initBrowseBar())
 		layout.addWidget(self.initVideoPlayer())
+		layout.addWidget(self.initInfoArea())
 
 		self.setLayout(layout)
 
-	def initBrowseBar(self):
-		return Browse("Browse",
-			{
-				'absolute': True,
-				'path': os.getcwd(),
-				'file': ''
-			},
-			'*.mp4', self.onBrowsePathChanged)
-
 	def initVideoPlayer(self):
 		self.videoPlayer = VideoPlayer(self)
+		sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+		sizePolicy.setHorizontalStretch(2)
+		self.videoPlayer.setSizePolicy(sizePolicy)
 		return self.videoPlayer
+
+	def initInfoArea(self):
+		widget = CommentArea(self)
+		sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+		sizePolicy.setHorizontalStretch(1)
+		widget.setSizePolicy(sizePolicy)
+		return widget
+
+	def onTabActivated(self):
+		pass
 
 	def onBrowsePathChanged(self, path):
 		self.videoPlayer.OpenFile(path)

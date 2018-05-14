@@ -56,25 +56,31 @@ class VideoViewer(QMainWindow):
 		# title
 		self.setWindowTitle('QA Viewer')
 
-		#self.initActions()
+		self.initMenuBar()
 		w, h = self.initContent()
 
 		# position/location
 		self.resize(w, h)
 		self.centerWindow()
 
-	#def initActions(self):
-	#	self.actions = Struct()
+	def initMenuBar(self):
+		self.menus = self.menuBar()
 
-		#self.actions.exit = QAction(QIcon('exit.png'), '&Exit', self)
-		#self.actions.exit.setShortcut('Ctrl+Q')
-		#self.actions.exit.setStatusTip('Exit application')
-		#self.actions.exit.triggered.connect(qApp.quit)
+		self.menus.file = self.menus.addMenu('File')
 
-		#self.actions.open = QAction(QIcon('open.png'), '&Open', self)
-		#self.actions.open.setShortcut('Ctrl+O')
-		#self.actions.open.setStatusTip('Open Data')
-		#self.actions.open.triggered.connect(self.openData)
+		self.menus.file.exit = QAction(QIcon('exit.png'), '&Exit', self)
+		self.menus.file.exit.setShortcut('Ctrl+Q')
+		self.menus.file.exit.setStatusTip('Exit application')
+		self.menus.file.exit.triggered.connect(qApp.quit)
+		self.menus.file.addAction(self.menus.file.exit)
+
+		self.menus.viewer = self.menus.addMenu('Viewer')
+
+		self.menus.viewer.openViewerFile = QAction(QIcon('open.png'), '&Open', self)
+		#self.menus.viewer.openViewerFile.setShortcut('Ctrl+O')
+		self.menus.viewer.openViewerFile.setStatusTip('Open Viewer Folder')
+		self.menus.viewer.openViewerFile.triggered.connect(self.openViewerFolder)
+		self.menus.viewer.addAction(self.menus.viewer.openViewerFile)
 
 	def initContent(self):
 
@@ -83,18 +89,26 @@ class VideoViewer(QMainWindow):
 
 		#self.statusBar().showMessage('Ready')
 
-		return (600, 600)
+		return (800, 600)
 
 	def initWindowTabs(self):
-		tabs = QTabWidget()
+		self.tabs = QTabWidget()
 		
 		self.record = TabRecord(self)
-		tabs.addTab(self.record, self.record.tabLabel)
+		self.tabs.addTab(self.record, self.record.tabLabel)
 		
 		self.view = TabView(self)
-		tabs.addTab(self.view, self.view.tabLabel)
+		self.tabs.addTab(self.view, self.view.tabLabel)
 
-		return tabs
+
+		self.tabs.currentChanged.connect(self.onTabChanged)
+		self.onTabChanged(0)
+
+		return self.tabs
+
+	def onTabChanged(self, tabIndex):
+		self.tabs.widget(tabIndex).onTabActivated()
+		self.menus.viewer.setEnabled(tabIndex == 1)
 
 	def centerWindow(self):
 		qr = self.frameGeometry()
@@ -102,37 +116,8 @@ class VideoViewer(QMainWindow):
 		qr.moveCenter(cp)
 		self.move(qr.topLeft())
 
-	def openData(self, filename=None):
-		"""Open a media file in a MediaPlayer
-		"""
-		if filename is None:
-			fileName, _ = QFileDialog.getOpenFileName(
-				self, "Open Data", QDir.homePath()
-			)
-		if not filename or fileName == '':
-			return
-
-		# create the media
-		self.media = self.instance.media_new(unicode(filename))
-		# put the media in the media player
-		self.vlcPlayer.set_media(self.media)
-
-		# parse the metadata of the file
-		self.media.parse()
-		# set the title of the track as window title
-		self.setWindowTitle(self.media.get_meta(0))
-
-		# the media player has to be 'connected' to the QFrame
-		# (otherwise a video would be displayed in it's own window)
-		# this is platform specific!
-		# you have to give the id of the QFrame (or similar object) to
-		# vlc, different platforms have different functions for this
-		if sys.platform == "linux2": # for Linux using the X Server
-			self.vlcPlayer.set_xwindow(self.videoframe.winId())
-		elif sys.platform == "win32": # for Windows
-			self.vlcPlayer.set_hwnd(self.videoframe.winId())
-		elif sys.platform == "darwin": # for MacOS
-			self.vlcPlayer.set_agl(self.videoframe.windId())
+	def openViewerFolder(self):
+		self.view.videoPlayer.OpenFile()
 
 	def onExecComplete(self):
 		self.record.onExecComplete()

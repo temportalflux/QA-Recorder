@@ -29,11 +29,14 @@ from PyQt5.QtGui import *
 import sys
 import os.path
 import vlc
+import logging
 
 class VideoPlayer(QWidget):
 
 	def __init__(self, parent=None):
 		super(VideoPlayer, self).__init__(parent)
+
+		self.currentFilename = None
 
 		# creating a basic vlc instance
 		self.instance = vlc.Instance()
@@ -42,8 +45,6 @@ class VideoPlayer(QWidget):
 
 		self.createUI()
 		self.isPaused = False
-
-		self.setMinimumHeight(400)
 
 	def createUI(self):
 		"""Set up the user interface, signals & slots
@@ -118,7 +119,6 @@ class VideoPlayer(QWidget):
 				return
 			self.mediaplayer.play()
 			self.playbutton.setText("Pause")
-			self.timer.start()
 			self.isPaused = False
 
 	def Stop(self):
@@ -131,9 +131,14 @@ class VideoPlayer(QWidget):
 		"""Open a media file in a MediaPlayer
 		"""
 		if filename is None:
-			filename = QFileDialog.getOpenFileName(self, "Open File", os.path.expanduser('~'))[0]
+			previousFilename = self.currentFilename
+			if not previousFilename:
+				previousFilename = os.path.expanduser('~')
+			filename = QFileDialog.getOpenFileName(self, "Open File", previousFilename)[0]
 		if not filename:
 			return
+
+		self.currentFilename = filename
 
 		# create the media
 		if sys.version < '3':
@@ -156,6 +161,11 @@ class VideoPlayer(QWidget):
 			self.mediaplayer.set_hwnd(self.videoframe.winId())
 		elif sys.platform == "darwin": # for MacOS
 			self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
+
+		w, h = self.mediaplayer.video_get_size()
+		self.onMediaChanged(w, h)
+		
+		self.timer.start()
 		
 	def setVolume(self, Volume):
 		"""Set the volume
@@ -177,11 +187,19 @@ class VideoPlayer(QWidget):
 		# setting the slider to the desired position
 		self.positionslider.setValue(self.mediaplayer.get_position() * 1000)
 
+		logging.getLogger('').info(self.mediaplayer.get_time())
+
 		if not self.mediaplayer.is_playing():
 			# no need to call this function if nothing is played
-			self.timer.stop()
 			if not self.isPaused:
 				# after the video finished, the play button stills shows
 				# "Pause", not the desired behavior of a media player
 				# this will fix it
 				self.Stop()
+
+	def onMediaChanged(self, width, height):
+		pass
+		#newWidth = self.size().width()
+		#newHeight = newWidth * (height / width)
+		#self.videoframe.setMinimumWidth(newWidth)
+		#self.videoframe.setMinimumHeight(newHeight)

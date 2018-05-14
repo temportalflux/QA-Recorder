@@ -313,5 +313,8 @@ class Tab(QTabWidget):
 		settings = TabSettings(self, self.activeConfig, self.savedConfig)
 		self.addTab(settings, settings.tabLabel)
 
+	def onTabActivated(self):
+		pass
+
 	def onExecComplete(self):
 		self.recorder.destroy()
