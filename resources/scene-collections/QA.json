@@ -13,7 +13,7 @@
         "id": "wasapi_output_capture",
         "mixers": 255,
         "monitoring_type": 0,
-        "muted": true,
+        "muted": false,
         "name": "Desktop Audio",
         "private_settings": {},
         "push-to-mute": false,
@@ -53,12 +53,7 @@
             "streamTimerMinutes": 0,
             "streamTimerSeconds": 30
         },
-        "scripts-tool": [
-            {
-                "path": "D:/Desktop/OBSPython/main.py",
-                "settings": {}
-            }
-        ]
+        "scripts-tool": []
     },
     "name": "QA",
     "preview_locked": false,
@@ -66,13 +61,13 @@
         {
             "duration": 300,
             "hotkeys": [],
-            "id": 3,
+            "id": 1,
             "name": "Cut"
         },
         {
             "duration": 300,
             "hotkeys": [],
-            "id": 4,
+            "id": 2,
             "name": "Fade"
         }
     ],
@@ -142,7 +137,7 @@
     ],
     "saved_projectors": [
         {
-            "saved_projectors": "Game Capture"
+            "saved_projectors": ""
         },
         {
             "saved_projectors": ""
@@ -235,7 +230,7 @@
             "push-to-talk-delay": 0,
             "settings": {
                 "capture_mode": "window",
-                "window": "Skyrates:UnityWndClass:Skyrates-0.2.10.exe"
+                "window": "Skyrates:UnityWndClass:Skyrates-0.3.3.exe"
             },
             "sync": 0,
             "volume": 1.0
@@ -261,21 +256,21 @@
             "push-to-talk": false,
             "push-to-talk-delay": 0,
             "settings": {
-                "id_counter": 5,
+                "id_counter": 3,
                 "items": [
                     {
                         "align": 5,
                         "bounds": {
-                            "x": 0.0,
-                            "y": 0.0
+                            "x": 1980.0,
+                            "y": 1024.0
                         },
                         "bounds_align": 0,
-                        "bounds_type": 0,
+                        "bounds_type": 2,
                         "crop_bottom": 0,
                         "crop_left": 0,
                         "crop_right": 0,
                         "crop_top": 0,
-                        "id": 5,
+                        "id": 3,
                         "locked": false,
                         "name": "Game Capture",
                         "pos": {

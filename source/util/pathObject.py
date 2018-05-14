@@ -69,3 +69,6 @@ class PathObject:
 		else:
 			self.setPathRaw(str(pathObj.relative_to(os.getcwd())))
 		self.setFile(filename)
+
+	def getLibPath(self):
+		return Path(self.getPathAbsoluteWithFile())

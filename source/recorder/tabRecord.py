@@ -140,6 +140,12 @@ class TabSettings(QWidget):
 			"dir", self.onChangedOutputPath, self.onChangedOutputPath)
 		layout_recording.addWidget(outputPath)
 
+		layout_recording.addWidget(self.initLabelledTextBox(
+			widget_recording, "Output name",
+			self.activeConfig.getActiveConfigAtPath(['obs', 'recording', 'output-name']),
+			self.onChangedRecordingName
+		))
+
 		widget_recording.setLayout(layout_recording)
 		layout.addWidget(widget_recording)
 
@@ -248,6 +254,10 @@ class TabSettings(QWidget):
 		self.checkForChangesInConfig()
 
 	def onChangedOutputPath(self, path):
+		self.checkForChangesInConfig()
+
+	def onChangedRecordingName(self, text):
+		self.activeConfig.data['obs']['recording']['output-name'] = text
 		self.checkForChangesInConfig()
 
 	def onChangedShouldStream(self, shouldStream):
