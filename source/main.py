@@ -10,12 +10,12 @@ from PyQt5.QtMultimediaWidgets import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from lib.struct import Struct
+from util.struct import Struct
 from recorder.tabRecord import Tab as TabRecord
 from viewer.tabViewer import Tab as TabView
 import vlc
 import logging
-from lib.config import Config
+from util.config import Config
 
 # http://doc.qt.io/qt-5/qmainwindow.html
 # http://zetcode.com/gui/pyqt5/firstprograms/
@@ -83,7 +83,7 @@ class VideoViewer(QMainWindow):
 
 		#self.statusBar().showMessage('Ready')
 
-		return (600, 400)
+		return (600, 600)
 
 	def initWindowTabs(self):
 		tabs = QTabWidget()

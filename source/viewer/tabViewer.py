@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
-from lib.browseBar import Browse
+from util.browseBar import Browse
 from viewer.videoPlayer import VideoPlayer
 import os
 

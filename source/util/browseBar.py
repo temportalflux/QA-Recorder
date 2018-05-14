@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
 from pathlib import Path
-from lib.pathHelper import *
-from lib.pathObject import PathObject
+from util.pathHelper import *
+from util.pathObject import PathObject
 
 class Browse(QGroupBox):
 
@@ -91,11 +91,11 @@ class Browse(QGroupBox):
 		fileName = None
 		if str(self.dialogFilter).startswith('d'):
 			fileName = QFileDialog.getExistingDirectory(
-				self, "Select TODO LABEL"
+				self, "Select TODO LABEL", path
 			)
 		else:
 			fileName, _ = QFileDialog.getOpenFileName(
-				self, 'Select TODO LABEL', path
+				self, 'Select TODO LABEL', path, 'Files ({})'.format(self.dialogFilter)
 			)
 		
 		if not fileName or fileName == '':

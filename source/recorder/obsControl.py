@@ -2,7 +2,7 @@ import asyncio
 import os
 
 import obswsrc
-from lib.pathObject import PathObject
+from util.pathObject import PathObject
 #from obswsrc import OBSWS
 #from obswsrc.requests import ResponseStatus, SetRecordingFolderRequest, SetCurrentProfileRequest, SetCurrentSceneCollectionRequest, SetCurrentSceneRequest, StartRecordingRequest, StopRecordingRequest, StartStreamingRequest, StopStreamingRequest
 #from obswsrc.types import Stream, StreamSettings
@@ -24,7 +24,7 @@ class OBSControl:
 
 		if "streaming" in obsData:
 			self.shouldStream = obsData["streaming"]['active']
-			self.setSettingsStream(obsData["streaming"]["settings"])
+			self.setSettingsStream(obsData["streaming"])
 		
 		obsSettings = obsData['settings']
 

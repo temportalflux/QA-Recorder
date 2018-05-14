@@ -12,15 +12,6 @@
 				"path": "resources\\obs\\bin\\64bit\\"
 			}
 		},
-		"settings": {
-			"profile": {
-				"absolute": false,
-				"file": "",
-				"path": "resources\\profiles\\QA"
-			},
-			"scene": "Scene",
-			"scene-collection": "resources\\scene-collections\\QA.json"
-		},
 		"recording": {
 			"active": true,
 			"output-path": {
@@ -29,17 +20,28 @@
 				"path": "recordings"
 			}
 		},
+		"settings": {
+			"profile": {
+				"absolute": false,
+				"file": "",
+				"path": "resources\\profiles\\QA\\"
+			},
+			"scene": "Scene",
+			"scene-collection": {
+				"absolute": false,
+				"file": "QA.json",
+				"path": "resources\\scene-collections"
+			}
+		},
 		"streaming": {
 			"active": false,
-			"settings": {
-				"authentiation": {
-					"enabled": false,
-					"password": "",
-					"username": ""
-				},
-				"key": "",
-				"server": ""
-			}
+			"authentiation": {
+				"enabled": false,
+				"password": "",
+				"username": ""
+			},
+			"key": "",
+			"server": ""
 		}
 	},
 	"target": {

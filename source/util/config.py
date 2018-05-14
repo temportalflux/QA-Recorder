@@ -24,6 +24,13 @@ class Config:
 			obj = obj[path.popleft()]
 		return obj
 
+	def setActiveConfigAtPath(self, path, value):
+		obj = self.data
+		path = deque(path)
+		while path:
+			obj = obj[path.popleft()]
+		obj = value
+
 	def hasChanges(self, other):
 		return self.data != other.data
 
