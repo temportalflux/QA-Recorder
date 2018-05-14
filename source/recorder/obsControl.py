@@ -2,6 +2,7 @@ import asyncio
 import os
 
 import obswsrc
+from lib.pathObject import PathObject
 #from obswsrc import OBSWS
 #from obswsrc.requests import ResponseStatus, SetRecordingFolderRequest, SetCurrentProfileRequest, SetCurrentSceneCollectionRequest, SetCurrentSceneRequest, StartRecordingRequest, StopRecordingRequest, StartStreamingRequest, StopStreamingRequest
 #from obswsrc.types import Stream, StreamSettings
@@ -15,17 +16,20 @@ class OBSControl:
 		self.shouldStream = False
 		self.stream = None
 
-	async def setup(self, obsSettings):
-		if "stream" in obsSettings:
-			self.setSettingsStream(obsSettings["stream"])
-		if "recording" in obsSettings:
-			self.shouldRecord = obsSettings["recording"]
-		if "streaming" in obsSettings:
-			self.shouldStream = obsSettings["streaming"]
-		if "output-path" in obsSettings:
-			await self.sendOutputPath(obsSettings["output-path"])
+	async def setup(self, obsData):
+
+		if "recording" in obsData:
+			self.shouldRecord = obsData["recording"]['active']
+			await self.sendOutputPath(PathObject(obsData["recording"]["output-path"]).getPathAbsoluteWithFile())
+
+		if "streaming" in obsData:
+			self.shouldStream = obsData["streaming"]['active']
+			self.setSettingsStream(obsData["streaming"]["settings"])
+		
+		obsSettings = obsData['settings']
+
 		if "profile" in obsSettings:
-			await self.sendProfile(obsSettings["profile"])
+			await self.sendProfile(PathObject(obsSettings["profile"]).getPathAbsoluteWithFile())
 		if "scene-collection" in obsSettings:
 			await self.sendSceneCollection(obsSettings["scene-collection"])
 		if "scene" in obsSettings:
@@ -51,8 +55,8 @@ class OBSControl:
 			"Couldn't set recording folder!"
 		)
 
-	async def sendProfile(self, profilePathRelative):
-		profilePath = os.path.join(os.getcwd(), profilePathRelative.replace("/","\\"))
+	async def sendProfile(self, profilePath):
+		self.logger.info('Setting profile path to {}'.format(profilePath))
 		success = await self.makeRequest(
 			obswsrc.requests['SetCurrentProfileRequest'](profile_name=profilePath),
 			"Set current profile to {}".format(profilePath),

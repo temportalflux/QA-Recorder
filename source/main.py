@@ -14,6 +14,8 @@ from lib.struct import Struct
 from recorder.tabRecord import Tab as TabRecord
 from viewer.tabViewer import Tab as TabView
 import vlc
+import logging
+from lib.config import Config
 
 # http://doc.qt.io/qt-5/qmainwindow.html
 # http://zetcode.com/gui/pyqt5/firstprograms/
@@ -23,8 +25,15 @@ class VideoViewer(QMainWindow):
 	def __init__(self, resources, parent=None):
 		super(VideoViewer, self).__init__(parent)
 		self.resourcesDir = resources
+		self.initConfig()
 		self.initResources()
 		self.initUI()
+
+	def initConfig(self):
+		self.savedConfig = Config('config.json')
+		self.savedConfig.load()
+		self.activeConfig = Config('config.json')
+		self.activeConfig.load()
 
 	def initResources(self):
 		self.resources = {
@@ -69,17 +78,8 @@ class VideoViewer(QMainWindow):
 
 	def initContent(self):
 
-		# Create a widget for window contents
-		#self.contentWidget = QWidget(self)
-		#self.setCentralWidget(self.contentWidget)
 		tabs = self.initWindowTabs()
 		self.setCentralWidget(tabs)
-
-		#self.buttons = Struct()
-		#self.buttons.play = QPushButton()
-		#self.buttons.play.setEnabled(False)
-		#self.buttons.play.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
-		#self.buttons.play.clicked.connect(self.play)
 
 		#self.statusBar().showMessage('Ready')
 
@@ -88,11 +88,11 @@ class VideoViewer(QMainWindow):
 	def initWindowTabs(self):
 		tabs = QTabWidget()
 		
-		#record = TabRecord()
-		#tabs.addTab(record, record.tabLabel)
+		self.record = TabRecord(self)
+		tabs.addTab(self.record, self.record.tabLabel)
 		
-		view = TabView()
-		tabs.addTab(view, view.tabLabel)
+		self.view = TabView(self)
+		tabs.addTab(self.view, self.view.tabLabel)
 
 		return tabs
 
@@ -134,10 +134,23 @@ class VideoViewer(QMainWindow):
 		elif sys.platform == "darwin": # for MacOS
 			self.vlcPlayer.set_agl(self.videoframe.windId())
 
+	def onExecComplete(self):
+		self.record.onExecComplete()
+		self.view.onExecComplete()
+
 def run():
+	logging.basicConfig(
+		level=logging.INFO,
+		format='%(levelname)7s: %(message)s',
+		stream=sys.stderr,
+	)
+
 	app = QApplication(sys.argv)
 	ex = VideoViewer(os.path.join(os.getcwd(), 'resources'))
-	sys.exit(app.exec_())
+	# halt while app is running
+	app.exec_()
+	# destroy everything
+	ex.onExecComplete()
 		
 if __name__ == '__main__':
 	run()

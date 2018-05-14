@@ -14,18 +14,14 @@ class ApplicationController:
 		# Format:
 		# {
 		#	"64": {
-		#		"start-dir": {
-		#			"absolute": false,
-		#			"path": "directories/under/cwd/"
-		#		},
-		#		"exe": "myapp.exe"
+		#		"absolute": false,
+		#		"path": "directories/under/cwd/",
+		#		"file": "myapp.exe"
 		#	},
 		#	"32": {
-		#		"start-dir": {
-		#			"absolute": false,
-		#			"path": "directories/under/cwd/"
-		#		},
-		#		"exe": "myapp.exe"
+		#		"absolute": false,
+		#		"path": "directories/under/cwd/",
+		#		"file": "myapp.exe"
 		#	}
 		# }
 		# 32 bit is mandatory, 64 bit is optional
@@ -69,11 +65,29 @@ class ApplicationController:
 	# Determines the absolute path for the start directory and the executable
 	def getAppLocation(self, cwd, bitSettings):
 		# Get the absolute path for the start directory
-		startDirectory = self.getStartDirectory(cwd, bitSettings['start-dir'])
+		startDirectory = self.getStartDirectory(cwd, bitSettings)
 		# Append the exe file
-		application = os.path.join(startDirectory, bitSettings['exe'])
+		application = os.path.join(startDirectory, bitSettings['file'])
 		# retrun the two
-		return { 'start-dir': startDirectory, 'exe': application }
+		return { 'start-dir': startDirectory, 'file': application }
+
+	def getAppAbsolute(self, forcedBitSetting):
+
+		bitSettings = self.settings[forcedBitSetting]
+
+		if 'default' in bitSettings and bitSettings['default']:
+			return ''
+
+		# Determine the absolute file locations of the start directory and the executable
+		appLocation = self.getAppLocation(os.getcwd(), bitSettings)
+
+		return os.path.join(appLocation['start-dir'], appLocation['file'])
+
+	def setFromAbsolute32(self, absolutePath):
+		pass
+
+	def setFromAbsolute64(self, absolutePath):
+		pass
 
 	# Opens the application
 	async def open(self, outputToConsole):
@@ -96,13 +110,13 @@ class ApplicationController:
 		if outputToConsole:
 			outPipe = asyncio.subprocess.PIPE
 		self.process = await asyncio.create_subprocess_exec(
-			self.appLocation['exe'],
+			self.appLocation['file'],
 			cwd = self.appLocation['start-dir'],
 			# stdout must a pipe to be accessible as process.stdout
 			stdout = outPipe
 		)
 
-		self.logger.info("Started: {} (pid = {})".format(self.appLocation['exe'], self.process.pid))
+		self.logger.info("Started: {} (pid = {})".format(self.appLocation['file'], self.process.pid))
 
 	# Alternative to close - waits for the application to close itself
 	# will halt the until process is finished
@@ -112,9 +126,9 @@ class ApplicationController:
 
 		# Progress
 		if self.process.returncode == 0:
-			self.logger.info("Done: {} (pid = {})".format(self.appLocation['exe'], self.process.pid))
+			self.logger.info("Done: {} (pid = {})".format(self.appLocation['file'], self.process.pid))
 		else:
-			self.logger.info("Failed: {} (pid = {})".format(self.appLocation['exe'], self.process.pid))
+			self.logger.info("Failed: {} (pid = {})".format(self.appLocation['file'], self.process.pid))
 
 		# Result
 		result = stdout.decode().strip()

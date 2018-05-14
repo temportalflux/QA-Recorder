@@ -16,25 +16,27 @@ from recorder.applicationController import ApplicationController
 #	os.chdir(home)
 #	return home
 
-def loadJson(filePath):
-	data = {}
-	with open(filePath) as file:
-		data = json.loads(file.read())
-	return data
-
 class Recorder:
 
-	def __init__(self):
+	def __init__(self, activeConfig):
 		self.logger = logging.getLogger('')
 		self.dirHome = os.getcwd()
-		self.config = loadJson("config.json")
+
+		self.configData = activeConfig.data
+		
 		self.taskManager = TaskManager(self.logger)
 
-		self.obs = ApplicationController(self.logger, 'OBS Studio', self.config["obs"]["executable"])
+		self.obs = ApplicationController(self.logger, 'OBS Studio', self.configData["obs"]["executable"])
 		self.targetApplication = self.createTargetApplication()
 
 	def run(self):
 		self.taskManager.runUntilComplete(self.runAndWait())
+		self.taskManager.destroy()
+
+	def runUntilComplete(self):
+		self.taskManager.runUntilComplete(self.runAndWait())
+
+	def destroy(self):
 		self.taskManager.destroy()
 
 	async def runAndWait(self):
@@ -46,7 +48,7 @@ class Recorder:
 			
 			controller = OBSControl(self.logger, obsws)
 
-			await controller.setup(self.config["obs"]["settings"])
+			await controller.setup(self.configData["obs"])
 
 			await self.targetApplication.open(True)
 
@@ -67,8 +69,14 @@ class Recorder:
 		self.obs.close()
 
 	def createTargetApplication(self):
-		targetAppSettings = self.config['target']
+		targetAppSettings = self.configData['target']
 		return ApplicationController(self.logger, targetAppSettings['name'], targetAppSettings)
+
+	def getProfile(self):
+		return self.configData['obs']['settings']['profile']
+
+	def setProfile(self, path):
+		self.configData['obs']['settings']['profile'] = path
 
 def runRecorder():
 	logging.basicConfig(

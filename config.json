@@ -1,56 +1,58 @@
 {
-	"obs":
-	{
-		"executable":
-		{
-			"64":
-			{
-				"start-dir": {
-					"absolute": false,
-					"path": "resources/obs/bin/64bit/"
-				},
-				"exe": "obs64.exe"
+	"obs": {
+		"executable": {
+			"32": {
+				"absolute": false,
+				"file": "obs32.exe",
+				"path": "resources\\obs\\bin\\32bit\\"
 			},
-			"32": 
-			{
-				"start-dir": {
-					"absolute": false,
-					"path": "resources/obs/bin/32bit/"
-				},
-				"exe": "obs32.exe"
+			"64": {
+				"absolute": false,
+				"file": "obs64.exe",
+				"path": "resources\\obs\\bin\\64bit\\"
 			}
 		},
-		"settings":
-		{
-			"recording": true,
-			"streaming": false,
-			"stream":
-			{
-				"server": "",
-				"key": "",
-				"authentiation":
-				{
-					"enabled": false,
-					"username": "",
-					"password": ""
-				}
+		"settings": {
+			"profile": {
+				"absolute": false,
+				"file": "",
+				"path": "resources\\profiles\\QA"
 			},
-			"output-path": "D:\\Desktop\\OBSPython\\recordings",
-			"profile": "resources/profiles/QA",
-			"scene-collection": "resources/scene-collections/QA.json",
-			"scene": "Scene"
+			"scene": "Scene",
+			"scene-collection": "resources\\scene-collections\\QA.json"
+		},
+		"recording": {
+			"active": true,
+			"output-path": {
+				"absolute": false,
+				"file": "",
+				"path": "recordings"
+			}
+		},
+		"streaming": {
+			"active": false,
+			"settings": {
+				"authentiation": {
+					"enabled": false,
+					"password": "",
+					"username": ""
+				},
+				"key": "",
+				"server": ""
+			}
 		}
 	},
-	"target":
-	{
-		"name": "Skyrates",
-		"32": 
-		{
-			"start-dir": {
-				"absolute": false,
-				"path": "resources/Skyrates-0.2.10/"
-			},
-			"exe": "Skyrates-0.2.10.exe"
-		}
+	"target": {
+		"32": {
+			"absolute": false,
+			"file": "Skyrates-0.3.3.exe",
+			"path": "resources\\Skyrates-0.3.3"
+		},
+		"64": {
+			"absolute": false,
+			"file": "Skyrates-0.3.3.exe",
+			"path": "resources\\Skyrates-0.3.3\\"
+		},
+		"name": "Skyrates"
 	}
 }
