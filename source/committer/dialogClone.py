@@ -19,7 +19,7 @@ class DialogClone(QDialog):
 
 	def exec_(self):
 		super(DialogClone, self).exec_()
-		return None
+		return self.getDestPath()
 
 	def initWindow(self, resources):
 		self.setWindowIcon(resources.getQIcon('clone'))
@@ -149,7 +149,7 @@ class DialogClone(QDialog):
 
 	def onChangedLocal(self):
 		self.validLocal = False
-		
+
 		destParentExists = self.getDestPathParent().exists()
 
 		self.markInfo(self.infoLocal,

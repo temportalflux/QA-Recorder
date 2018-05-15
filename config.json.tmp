@@ -59,6 +59,23 @@
 		"name": "Skyrates-0.3.3"
 	},
 	"viewer": {
-		"comments-name": "comments.json"
+		"comments-name": "comments.json",
+		"recordings": {
+			"source": {
+				"committer": "temportalflux",
+				"password": "<my super secret password>",
+				"user": "temportalflux",
+				"repository": "QA-Recorder",
+				"branch": "recordings"
+			},
+			"destination": {
+				"name": "recordings",
+				"parent-path": {
+					"absolute": false,
+					"file": "",
+					"path": ""
+				}
+			}
+		}
 	}
 }

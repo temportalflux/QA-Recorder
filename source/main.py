@@ -139,11 +139,10 @@ class VideoViewer(QMainWindow):
 			self.repoPath = repoPath
 			self.onRepoPathChanged()
 
-	def pullRepo(self):
-		pass
-
 	def deleteRepo(self):
-		pass
+		self.repoPath.rmTree()
+		self.repoPath = None
+		self.onRepoPathChanged()
 
 	def onRepoPathChanged(self):
 		pathValid = self.repoPath is not None
