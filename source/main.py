@@ -4,18 +4,23 @@
 
 import os
 import sys
+import vlc
+import logging
+
 from PyQt5.QtCore import *
 from PyQt5.QtMultimedia import *
 from PyQt5.QtMultimediaWidgets import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+
 from util.struct import Struct
 from recorder.tabRecord import Tab as TabRecord
 from viewer.tabViewer import Tab as TabView
-import vlc
-import logging
 from util.config import Config
+from committer.dialogClone import DialogClone
+from committer.committer import GitControl
+from util.resources import Resources
 
 # http://doc.qt.io/qt-5/qmainwindow.html
 # http://zetcode.com/gui/pyqt5/firstprograms/
@@ -24,9 +29,8 @@ class VideoViewer(QMainWindow):
 	
 	def __init__(self, resources, parent=None):
 		super(VideoViewer, self).__init__(parent)
-		self.resourcesDir = resources
 		self.initConfig()
-		self.initResources()
+		self.resources = Resources(resources)
 		self.initUI()
 
 	def initConfig(self):
@@ -34,13 +38,6 @@ class VideoViewer(QMainWindow):
 		self.savedConfig.load()
 		self.activeConfig = Config('config.json')
 		self.activeConfig.load()
-
-	def initResources(self):
-		self.resources = {
-			'icon': 'icons/icon.png'
-		}
-		for key,value in self.resources.items():
-			self.resources[key] = os.path.join(self.resourcesDir, value)
 		
 	def initUI(self):
 		self.initQt()
@@ -52,7 +49,7 @@ class VideoViewer(QMainWindow):
 
 	def initWindow(self):
 		# icon
-		self.setWindowIcon(QIcon(self.resources['icon']))
+		self.setWindowIcon(self.resources.getQIcon('icon'))
 		# title
 		self.setWindowTitle('QA Viewer')
 
@@ -67,20 +64,41 @@ class VideoViewer(QMainWindow):
 		self.menus = self.menuBar()
 
 		self.menus.file = self.menus.addMenu('File')
+		self.initMenuFile(self.menus.file)
 
-		self.menus.file.exit = QAction(QIcon('exit.png'), '&Exit', self)
-		self.menus.file.exit.setShortcut('Ctrl+Q')
-		self.menus.file.exit.setStatusTip('Exit application')
-		self.menus.file.exit.triggered.connect(qApp.quit)
-		self.menus.file.addAction(self.menus.file.exit)
+		self.menus.repository = self.menus.addMenu('Repository')
+		self.initMenuRepository(self.menus.repository)
 
 		self.menus.viewer = self.menus.addMenu('Viewer')
+		self.initMenuViewer(self.menus.viewer)
 
-		self.menus.viewer.openViewerFile = QAction(QIcon('open.png'), '&Open', self)
-		#self.menus.viewer.openViewerFile.setShortcut('Ctrl+O')
-		self.menus.viewer.openViewerFile.setStatusTip('Open Viewer Folder')
-		self.menus.viewer.openViewerFile.triggered.connect(self.onActionOpen)
-		self.menus.viewer.addAction(self.menus.viewer.openViewerFile)
+	def initAction(self, name, iconName, tip, onTriggered, shortcut=None):
+		action = QAction(self.resources.getQIcon(iconName), '&{}'.format(name), self)
+		action.setStatusTip(tip)
+		action.triggered.connect(onTriggered)
+		if shortcut:
+			action.setShortcut(shortcut)
+		return action
+
+	def initMenuFile(self, menu):
+		menu.exit = self.initAction('Exit', 'exit', 'Exit application', qApp.quit, 'Ctrl+Q')
+		menu.addAction(menu.exit)
+
+	def initMenuRepository(self, menu):
+		self.repoPath = None
+		self.committer = GitControl(logging.getLogger('Git'))
+
+		menu.clone = self.initAction('Clone/Pull', 'clone', 'Clone/Pull Repository', self.displayDialogCloneRepo)
+		menu.addAction(menu.clone)
+
+		menu.delete = self.initAction('Delete', 'exit', 'Delete Repository', self.deleteRepo)
+		menu.addAction(menu.delete)
+
+		self.onRepoPathChanged()
+
+	def initMenuViewer(self, menu):
+		menu.openViewerFile = self.initAction('Open', 'open', 'Open Viewer Folder', self.onActionOpen)
+		menu.addAction(menu.openViewerFile)
 
 	def initContent(self):
 
@@ -112,6 +130,25 @@ class VideoViewer(QMainWindow):
 
 	def onActionOpen(self):
 		self.view.onActionOpen()
+
+	def displayDialogCloneRepo(self):
+		dialog = DialogClone(self.resources, self.committer)
+		repoPath = dialog.exec_()
+		if repoPath:
+			logging.getLogger('').info(repoPath)
+			self.repoPath = repoPath
+			self.onRepoPathChanged()
+
+	def pullRepo(self):
+		pass
+
+	def deleteRepo(self):
+		pass
+
+	def onRepoPathChanged(self):
+		pathValid = self.repoPath is not None
+		self.menus.repository.clone.setEnabled(not pathValid)
+		self.menus.repository.delete.setEnabled(pathValid)
 
 	def centerWindow(self):
 		qr = self.frameGeometry()

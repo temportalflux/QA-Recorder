@@ -14,7 +14,11 @@ class Browse(QGroupBox):
 
 	def __init__(self, name, target, filter="*", onPathChanged=None, onAnyChange=None):
 		super(Browse, self).__init__(name)
-		self.pathObject = PathObject(target)
+
+		if isinstance(target, str):
+			self.pathObject = PathObject.initFromPath(target)
+		else:
+			self.pathObject = PathObject(target)
 
 		self.dialogFilter = filter
 		self.onPathChanged = onPathChanged
@@ -120,4 +124,7 @@ class Browse(QGroupBox):
 
 	def isBrowsePathValid(self):
 		return self.pathObject.isValid()
+
+	def getLibPath(self):
+		return self.pathObject.getLibPath()
 

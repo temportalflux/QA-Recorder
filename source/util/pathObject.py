@@ -14,6 +14,19 @@ class PathObject:
 		#}
 		self.target = target
 
+	def initFromPath(absolutePath):
+		libpath = Path(absolutePath)
+		pathStr = libpath.parent
+		file = libpath.name
+		if libpath.is_dir():
+			pathStr = str(libpath)
+			file = ''
+		return PathObject({
+			'absolute': True,
+			'path': pathStr,
+			'file': file
+		})
+
 	def isAbsolute(self):
 		return self.target['absolute']
 
