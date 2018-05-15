@@ -79,7 +79,7 @@ class VideoViewer(QMainWindow):
 		self.menus.viewer.openViewerFile = QAction(QIcon('open.png'), '&Open', self)
 		#self.menus.viewer.openViewerFile.setShortcut('Ctrl+O')
 		self.menus.viewer.openViewerFile.setStatusTip('Open Viewer Folder')
-		self.menus.viewer.openViewerFile.triggered.connect(self.openViewerFolder)
+		self.menus.viewer.openViewerFile.triggered.connect(self.onActionOpen)
 		self.menus.viewer.addAction(self.menus.viewer.openViewerFile)
 
 	def initContent(self):
@@ -110,14 +110,14 @@ class VideoViewer(QMainWindow):
 		self.tabs.widget(tabIndex).onTabActivated()
 		self.menus.viewer.setEnabled(tabIndex == 1)
 
+	def onActionOpen(self):
+		self.view.onActionOpen()
+
 	def centerWindow(self):
 		qr = self.frameGeometry()
 		cp = QDesktopWidget().availableGeometry().center()
 		qr.moveCenter(cp)
 		self.move(qr.topLeft())
-
-	def openViewerFolder(self):
-		self.view.videoPlayer.OpenFile()
 
 	def onExecComplete(self):
 		self.record.onExecComplete()

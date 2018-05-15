@@ -57,5 +57,8 @@
 			"path": "Skyrates-0.3.3"
 		},
 		"name": "Skyrates-0.3.3"
+	},
+	"viewer": {
+		"comments-name": "comments.json"
 	}
 }

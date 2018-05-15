@@ -30,13 +30,19 @@ import sys
 import os.path
 import vlc
 import logging
+from viewer.scrubBar import ScrubBar
+import datetime
 
 class VideoPlayer(QWidget):
 
-	def __init__(self, parent=None):
+	def __init__(self, parent=None, onScrubComplete=None, onUpdateTick=None, getBookmarks=None, onChangeBookmarkWidth=None):
 		super(VideoPlayer, self).__init__(parent)
 
 		self.currentFilename = None
+		self.onScrubComplete = onScrubComplete
+		self.onUpdateTick = onUpdateTick
+		self.getBookmarks = getBookmarks
+		self.onChangeBookmarkWidth = onChangeBookmarkWidth
 
 		# creating a basic vlc instance
 		self.instance = vlc.Instance()
@@ -45,6 +51,7 @@ class VideoPlayer(QWidget):
 
 		self.createUI()
 		self.isPaused = False
+		self.scrubberPressed_wasPaused = True
 
 	def createUI(self):
 		"""Set up the user interface, signals & slots
@@ -63,12 +70,26 @@ class VideoPlayer(QWidget):
 		self.videoframe.setPalette(self.palette)
 		self.videoframe.setAutoFillBackground(True)
 
-		self.positionslider = QSlider(Qt.Horizontal, self)
+		self.hboxScrub = QHBoxLayout()
+
+		self.labelTime = QLabel('00:00:00')
+		self.labelTime.setMaximumHeight(20)
+		self.hboxScrub.addWidget(self.labelTime)
+
+		self.positionslider = ScrubBar(self, self.getBookmarks)
 		self.positionslider.setToolTip("Position")
 		self.positionslider.setMaximum(1000)
-		self.positionslider.sliderMoved.connect(self.setPosition)
+		self.positionslider.sliderPressed.connect(self.onScrubberPressed)
+		self.positionslider.sliderMoved.connect(self.onScrubberMoved)
+		self.positionslider.sliderReleased.connect(self.onScrubberReleased)
+		self.hboxScrub.addWidget(self.positionslider)
+
+		self.labelDuration = QLabel('00:00:00')
+		self.labelDuration.setMaximumHeight(20)
+		self.hboxScrub.addWidget(self.labelDuration)
 
 		self.hbuttonbox = QHBoxLayout()
+
 		self.playbutton = QPushButton("Play")
 		self.hbuttonbox.addWidget(self.playbutton)
 		self.playbutton.clicked.connect(self.PlayPause)
@@ -77,7 +98,18 @@ class VideoPlayer(QWidget):
 		self.hbuttonbox.addWidget(self.stopbutton)
 		self.stopbutton.clicked.connect(self.Stop)
 
-		self.hbuttonbox.addStretch(1)
+		self.hbuttonbox.addStretch(1.0)
+
+		self.bookmarkslider = QSlider(Qt.Horizontal, self)
+		self.bookmarkslider.setMaximum(3000)
+		self.bookmarkslider.setValue(1000)
+		self.bookmarkslider.setToolTip("Bookmark Width")
+		self.bookmarkslider.valueChanged.connect(self.setBookmarkWidth)
+		self.bookmarkslider.setEnabled(False)
+		self.hbuttonbox.addWidget(self.bookmarkslider)
+
+		#self.hbuttonbox.addStretch(0.1)
+
 		self.volumeslider = QSlider(Qt.Horizontal, self)
 		self.volumeslider.setMaximum(100)
 		self.volumeslider.setValue(self.mediaplayer.audio_get_volume())
@@ -87,7 +119,7 @@ class VideoPlayer(QWidget):
 
 		self.vboxlayout = QVBoxLayout()
 		self.vboxlayout.addWidget(self.videoframe)
-		self.vboxlayout.addWidget(self.positionslider)
+		self.vboxlayout.addLayout(self.hboxScrub)
 		self.vboxlayout.addLayout(self.hbuttonbox)
 
 		self.setLayout(self.vboxlayout)
@@ -119,6 +151,7 @@ class VideoPlayer(QWidget):
 				return
 			self.mediaplayer.play()
 			self.playbutton.setText("Pause")
+			self.timer.start()
 			self.isPaused = False
 
 	def Stop(self):
@@ -162,17 +195,23 @@ class VideoPlayer(QWidget):
 		elif sys.platform == "darwin": # for MacOS
 			self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
 
+		self.bookmarkslider.setEnabled(True)
+		self.labelDuration.setText(self.getDurationStr())
+
 		w, h = self.mediaplayer.video_get_size()
 		self.onMediaChanged(w, h)
-		
-		self.timer.start()
 		
 	def setVolume(self, Volume):
 		"""Set the volume
 		"""
 		self.mediaplayer.audio_set_volume(Volume)
 
-	def setPosition(self, position):
+	def onScrubberPressed(self):
+		self.scrubberPressed_wasPaused = self.isPaused
+		if not self.isPaused:
+			self.PlayPause()
+
+	def onScrubberMoved(self, position):
 		"""Set the position
 		"""
 		# setting the position to where the slider was dragged
@@ -181,21 +220,33 @@ class VideoPlayer(QWidget):
 		# uses integer variables, so you need a factor; the higher the
 		# factor, the more precise are the results
 		# (1000 should be enough)
+		self.labelTime.setText(self.msToHMS(self.mediaplayer.get_time()))
+
+	def onScrubberReleased(self):
+		self.onScrubComplete(self.mediaplayer.get_time(), self.getDuration())
+		if not self.scrubberPressed_wasPaused:
+			self.PlayPause()
 
 	def updateUI(self):
 		"""updates the user interface"""
 		# setting the slider to the desired position
 		self.positionslider.setValue(self.mediaplayer.get_position() * 1000)
-
-		logging.getLogger('').info(self.mediaplayer.get_time())
+		self.labelTime.setText(self.msToHMS(self.mediaplayer.get_time()))
+		
+		self.onUpdateTick(self.mediaplayer.get_time(), self.getDuration())
 
 		if not self.mediaplayer.is_playing():
 			# no need to call this function if nothing is played
+			self.timer.stop()
 			if not self.isPaused:
 				# after the video finished, the play button stills shows
 				# "Pause", not the desired behavior of a media player
 				# this will fix it
 				self.Stop()
+
+	def getDuration(self):
+		#return self.mediaplayer.get_length()
+		return self.media.get_duration()
 
 	def onMediaChanged(self, width, height):
 		pass
@@ -203,3 +254,20 @@ class VideoPlayer(QWidget):
 		#newHeight = newWidth * (height / width)
 		#self.videoframe.setMinimumWidth(newWidth)
 		#self.videoframe.setMinimumHeight(newHeight)
+
+	def getBookmarkWidth(self):
+		return self.bookmarkslider.value()
+
+	def setBookmarkWidth(self, value):
+		self.onChangeBookmarkWidth(self.getDuration(), self.getBookmarkWidth())
+
+	def getDurationStr(self):
+		return self.msToHMS(self.getDuration())
+
+	def msToHMS(self, ms):
+		duration = datetime.timedelta(milliseconds=ms)
+		days, seconds = duration.days, duration.seconds
+		hours = days * 24 + seconds // 3600
+		minutes = (seconds % 3600) // 60
+		seconds = (seconds % 60)
+		return '{0:02d}:{1:02d}:{2:02d}'.format(hours, minutes, seconds)
