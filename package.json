@@ -1,6 +1,6 @@
 {
-  "name": "qa-recorder-react",
-  "productName": "qa-recorder-react",
+  "name": "qa-recorder",
+  "productName": "QA Recorder",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": "src/index.js",
@@ -32,17 +32,17 @@
         "packageManager": "npm"
       },
       "electronWinstallerConfig": {
-        "name": "qa_recorder_react"
+        "name": "qa_recorder"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
       "github_repository": {
-        "owner": "",
-        "name": ""
+        "owner": "temportalflux",
+        "name": "QA-Recorder"
       },
       "windowsStoreConfig": {
         "packageName": "",
-        "name": "qarecorderreact"
+        "name": "qarecorder"
       }
     }
   },
