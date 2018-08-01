@@ -11,28 +11,29 @@ const isDevMode = process.execPath.match(/[\\/]electron/);
 if (isDevMode) enableLiveReload({ strategy: 'react-hmr' });
 
 const createWindow = async () => {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-  });
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
+    // Create the browser window.
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+    });
 
-  // Open the DevTools.
-  if (isDevMode) {
-    await installExtension(REACT_DEVELOPER_TOOLS);
-    mainWindow.webContents.openDevTools();
-  }
+    // and load the index.html of the app.
+    mainWindow.loadURL(`file://${__dirname}/index.html`);
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-  });
+    // Open the DevTools.
+    if (isDevMode) {
+        await installExtension(REACT_DEVELOPER_TOOLS);
+        mainWindow.webContents.openDevTools();
+    }
+
+    // Emitted when the window is closed.
+    mainWindow.on('closed', () => {
+        // Dereference the window object, usually you would store windows
+        // in an array if your app supports multi windows, this is the time
+        // when you should delete the corresponding element.
+        mainWindow = null;
+    });
 };
 
 // This method will be called when Electron has finished
