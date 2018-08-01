@@ -2,6 +2,7 @@ import React from 'react';
 import { initMenu } from './AppMenu';
 import { Button } from 'semantic-ui-react';
 import OBS from './OBS';
+import Viewer from './video/Viewer';
 
 export default class App extends React.Component {
 
@@ -26,6 +27,7 @@ export default class App extends React.Component {
             <div>
                 <h2>Welcome to React!</h2>
                 <Button onClick={this._launchOBS}>Launch</Button>
+                <Viewer />
             </div>
         );
     }
