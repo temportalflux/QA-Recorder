@@ -3,15 +3,32 @@ import * as shortid from 'shortid';
 
 export default class TimestampDisplayBar extends React.Component {
 
+    // TODO: L-Click bar seeks video to that timestamp
+    // TODO: R-Click bookmark seeks video to start of bookmark or end of last bookmark (if no bookmark at position)
     constructor(props) {
         super(props);
 
+        this._fetchCurrentPlaybackTime = this._fetchCurrentPlaybackTime.bind(this);
         this._getTotalTime = this._getTotalTime.bind(this);
         this._getTimestamps = this._getTimestamps.bind(this);
         this._recompileBookmarks = this._recompileBookmarks.bind(this);
         this._renderBookmarks = this._renderBookmarks.bind(this);
 
-        this._recompileBookmarks();
+        this.state = {
+            bookmarks: this._recompileBookmarks(),
+            currentPlaybackTime: 0,
+            currentPlaybackPercent: 0,
+        };
+
+        this.fetchCurrentPlaybackTimeInterval = setInterval(this._fetchCurrentPlaybackTime, 100);
+    }
+
+    _fetchCurrentPlaybackTime() {
+        let playbackTime = this.props.getPlaybackTime();
+        this.setState({
+            currentPlaybackTime: playbackTime,
+            currentPlaybackPercent: playbackTime / this._getTotalTime(),
+        });
     }
 
     _getTotalTime() {
@@ -23,7 +40,7 @@ export default class TimestampDisplayBar extends React.Component {
     }
 
     _recompileBookmarks() {
-        this.bookmarks = this._getTimestamps().map((timestamp) => {
+        return this._getTimestamps().map((timestamp) => {
             let start = timestamp.start / this._getTotalTime();
             let end = timestamp.end !== undefined ? timestamp.end : timestamp.start + timestamp.duration;
             end /= this._getTotalTime();
@@ -31,8 +48,21 @@ export default class TimestampDisplayBar extends React.Component {
         });
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.timestamps !== this.props.timestamps)
+        {
+            this.setState({
+                bookmarks: this._recompileBookmarks(),
+            });
+        }
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.fetchCurrentPlaybackTimeInterval);
+    }
+
     _renderBookmarks() {
-        return this.bookmarks.map((bookmark) => {
+        return this.state.bookmarks.map((bookmark) => {
             return (
                 <div
                     key={shortid.generate()}
@@ -57,6 +87,15 @@ export default class TimestampDisplayBar extends React.Component {
                 }}
             >
                 {this._renderBookmarks()}
+                <div
+                    style={{
+                        backgroundColor: '#000000',
+                        height: this.props.height,
+                        position: 'absolute',
+                        left: `${this.state.currentPlaybackPercent * 100 - this.props.cursorWidth * 0.5}%`,
+                        width: `${this.props.cursorWidth}%`,
+                    }}
+                />
             </div>
         );
     }
@@ -67,27 +106,9 @@ TimestampDisplayBar.defaultProps = {
     backgroundColor: 'rgba(115, 133, 159, 1.0)',
     bookmarkColor: 'yellow',
     height: '1.0em',
-    totalTimeMs: 10*60*1000,// 10 minutes in ms = 600000ms
-    timestamps: [
-        {
-            start: 0,
-            end: 0.15 * 600000,
-        },
-        {
-            start: 0.20 * 600000,
-            duration: 0.15 * 600000,
-        },
-        {
-            start: 0.40 * 600000,
-            duration: 0.15 * 600000,
-        },
-        {
-            start: 0.60 * 600000,
-            duration: 0.15 * 600000,
-        },
-        {
-            start: 0.80 * 600000,
-            duration: 0.15 * 600000,
-        },
-    ],
+    cursorWidth: 0.5,
+
+    totalTimeMs: 0,
+    timestamps: [],
+    getPlaybackTime: () => 0,
 };
