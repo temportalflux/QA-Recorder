@@ -1,30 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Header, Modal} from "semantic-ui-react";
+import {Button, Form, Header, Modal} from "semantic-ui-react";
 import FileSystem from "./FileSystem";
 import * as lodash from "lodash";
-
-export let SYSTEM_SETTINGS = {
-};
+import {LOCAL_DATA} from "./LocalData";
+import ExecutableSettings from "./settings/ExecutableSettings";
 
 export class Settings extends React.Component {
 
+    static getSettings() { return LOCAL_DATA.get('settings', {}); }
+
     static async loadSettings() {
         let exists = await FileSystem.existsRelative('config.json');
-        let loadedData = SYSTEM_SETTINGS;
+        let settings = Settings.getSettings();
+        let loadedData = settings;
         if (exists) {
             loadedData = JSON.parse(await FileSystem.readFileRelative('config.json'));
         }
         else {
             await Settings.saveSystemSettings();
         }
-        SYSTEM_SETTINGS = lodash.defaultsDeep(loadedData, SYSTEM_SETTINGS);
-        console.log("Loaded system settings", SYSTEM_SETTINGS);
+        settings = LOCAL_DATA.set('settings', lodash.defaultsDeep(loadedData, settings));
+        console.log("Loaded system settings", settings);
     }
 
     static async saveSystemSettings() {
-        console.log("Saving system settings", SYSTEM_SETTINGS);
-        await FileSystem.writeFileRelative('config.json', JSON.stringify(SYSTEM_SETTINGS));
+        let settings = Settings.getSettings();
+        console.log("Saving system settings", settings);
+        await FileSystem.writeFileRelative('config.json', JSON.stringify(settings, undefined, 4));
     }
 
     constructor(props) {
@@ -32,11 +35,13 @@ export class Settings extends React.Component {
 
         this._handleOpen = this._handleOpen.bind(this);
         this._handleClose = this._handleClose.bind(this);
+        this._handleCancel = this._handleCancel.bind(this);
         this._handleSaveAndClose = this._handleSaveAndClose.bind(this);
         this._renderSettings = this._renderSettings.bind(this);
 
         this.state = {
             isOpen: false,
+            snapshot: undefined,
         };
     }
 
@@ -49,16 +54,32 @@ export class Settings extends React.Component {
     }
 
     _handleOpen() {
-        this.setState({ isOpen: true });
+        this.setState({
+            isOpen: true,
+            snapshot: this.state.snapshot || lodash.cloneDeep(Settings.getSettings()),
+        });
     }
 
     _handleClose() {
-        this.setState({ isOpen: false });
+        this.setState({
+            isOpen: false,
+        });
+    }
+
+    _handleCancel() {
+        LOCAL_DATA.set('settings', this.state.snapshot);
+        this.setState({
+            isOpen: false,
+            snapshot: undefined,
+        });
     }
 
     _handleSaveAndClose() {
         let promise = Settings.saveSystemSettings();
-        this._handleClose();
+        this.setState({
+            isOpen: false,
+            snapshot: undefined,
+        });
     }
 
     render() {
@@ -73,8 +94,11 @@ export class Settings extends React.Component {
                     {this._renderSettings()}
                 </Modal.Content>
                 <Modal.Actions>
+                    <Button color='red' onClick={this._handleCancel} secondary>
+                        Cancel
+                    </Button>
                     <Button color='green' onClick={this._handleSaveAndClose} primary>
-                        Save and Return
+                        Save
                     </Button>
                 </Modal.Actions>
             </Modal>
@@ -83,9 +107,16 @@ export class Settings extends React.Component {
 
     _renderSettings() {
         return (
-            <div>
+            <Form>
 
-            </div>
+                <Form.Field>
+                    <label>Target Executable</label>
+                    <ExecutableSettings
+                        saveKey={`settings.target`}
+                    />
+                </Form.Field>
+
+            </Form>
         );
     }
 

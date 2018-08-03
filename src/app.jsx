@@ -1,9 +1,8 @@
 import React from 'react';
 import {initMenu} from './AppMenu';
 import OBS from './OBS';
-import EventSystem from "./EventSystem";
 import {Settings} from "./Settings";
-import LocalData from "./LocalData";
+import {EVENTS} from "./EventSystem";
 
 export default class App extends React.Component {
 
@@ -14,10 +13,7 @@ export default class App extends React.Component {
 
         this.obs = new OBS();
 
-        this.events = new EventSystem();
-        this.localData = new LocalData(this.events);
-
-        initMenu(this.events);
+        initMenu(EVENTS);
     }
 
     componentDidMount() {
@@ -38,7 +34,7 @@ export default class App extends React.Component {
         return (
             <div>
                 <Settings
-                    events={this.events}
+                    events={EVENTS}
                 />
 
                 <h2>Welcome to React!</h2>

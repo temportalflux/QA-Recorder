@@ -1,6 +1,6 @@
 import * as lodash from "lodash";
 
-export default class EventSystem {
+class EventSystem {
 
     constructor() {
         this.events = {};
@@ -34,3 +34,5 @@ export default class EventSystem {
     }
 
 }
+
+export const EVENTS = new EventSystem();

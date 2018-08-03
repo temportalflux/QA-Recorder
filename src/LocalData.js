@@ -1,10 +1,9 @@
 import * as lodash from "lodash";
+import {EVENTS} from "./EventSystem";
 
-export default class LocalData {
+class LocalData {
 
-    constructor(events) {
-        this.events = events;
-
+    constructor() {
         this._getEventKey = this._getEventKey.bind(this);
         this.subscribe = this.subscribe.bind(this);
         this.unsubscribe = this.unsubscribe.bind(this);
@@ -19,11 +18,11 @@ export default class LocalData {
     }
 
     subscribe(path, handle, func) {
-        this.events.subscribe(this._getEventKey(lodash.toPath(path)), handle, func);
+        EVENTS.subscribe(this._getEventKey(lodash.toPath(path)), handle, func);
     }
 
     unsubscribe(path, handle) {
-        this.events.unsubscribe(this._getEventKey(lodash.toPath(path)), handle);
+        EVENTS.unsubscribe(this._getEventKey(lodash.toPath(path)), handle);
     }
 
     set(path, value) {
@@ -32,12 +31,16 @@ export default class LocalData {
         for (const pathEntry of lodash.toPath(path))
         {
             currentPath.push(pathEntry);
-            this.events.dispatch(this._getEventKey(currentPath), value);
+            EVENTS.dispatch(this._getEventKey(currentPath), value);
         }
+        return value;
     }
 
     get(path, defaultValue) {
+        if (!lodash.has(this.data, path)) return defaultValue;
         return lodash.get(this.data, path, defaultValue);
     }
 
 }
+
+export const LOCAL_DATA  = new LocalData();

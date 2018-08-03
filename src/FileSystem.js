@@ -1,11 +1,13 @@
 import * as electron from "electron";
+import {remote} from 'electron';
 import fs from 'fs';
 import path from 'path';
+import * as lodash from "lodash";
 
 export default class FileSystem {
 
     static cwd() {
-        return path.normalize(electron.remote.app.getAppPath());
+        return path.normalize(remote.app.getAppPath());
     }
 
     static exists(filePath) {
@@ -52,6 +54,13 @@ export default class FileSystem {
 
     static async writeFileRelative(filePath, data) {
         return await FileSystem.writeFile(path.join(FileSystem.cwd(), filePath), data);
+    }
+
+    static displayDialog(options) {
+        options = lodash.defaultsDeep(options, {});
+        return new Promise((resolve) => {
+            remote.dialog.showOpenDialog(options, resolve);
+        });
     }
 
 }
