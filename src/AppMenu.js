@@ -1,9 +1,18 @@
 import * as electron from 'electron';
 
-export function initMenu() {
+export function initMenu(events) {
     electron.remote.Menu.setApplicationMenu(electron.remote.Menu.buildFromTemplate([
         {
-            label: '--primary--',
+            label: 'File',
+            submenu: [
+                {
+                    label: 'Settings',
+                    click: () => { events.dispatch("openSettings"); },
+                }
+            ]
+        },
+        {
+            label: 'Edit',
             submenu: [
                 {role: 'undo'},
                 {role: 'redo'},

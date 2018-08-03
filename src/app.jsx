@@ -1,8 +1,9 @@
 import React from 'react';
-import { initMenu } from './AppMenu';
-import { Button } from 'semantic-ui-react';
+import {initMenu} from './AppMenu';
 import OBS from './OBS';
-import Viewer from './video/Viewer';
+import EventSystem from "./EventSystem";
+import {Settings} from "./Settings";
+import LocalData from "./LocalData";
 
 export default class App extends React.Component {
 
@@ -11,10 +12,16 @@ export default class App extends React.Component {
 
         this._launchOBS = this._launchOBS.bind(this);
 
-        initMenu();
-
         this.obs = new OBS();
 
+        this.events = new EventSystem();
+        this.localData = new LocalData(this.events);
+
+        initMenu(this.events);
+    }
+
+    componentDidMount() {
+        let promise = Settings.loadSettings();
     }
 
     async _launchOBS() {
@@ -23,11 +30,18 @@ export default class App extends React.Component {
     }
 
     render() {
-        return (
-            <div>
-                <h2>Welcome to React!</h2>
+        /*
+
                 <Button onClick={this._launchOBS}>Launch</Button>
                 <Viewer />
+        */
+        return (
+            <div>
+                <Settings
+                    events={this.events}
+                />
+
+                <h2>Welcome to React!</h2>
             </div>
         );
     }
