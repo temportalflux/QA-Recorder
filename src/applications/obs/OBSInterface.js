@@ -1,7 +1,8 @@
-import CreateApplicationController from './CreateApplicationController';
+import CreateApplicationController from '../CreateApplicationController';
 import OBSWebSocket from 'obs-websocket-js';
 
-export default class OBS {
+
+export default class OBSInterface {
 
     constructor() {
         this._onConnectionOpened = this._onConnectionOpened.bind(this);
@@ -58,3 +59,5 @@ export default class OBS {
     }
 
 }
+
+export const OBS = new OBSInterface();

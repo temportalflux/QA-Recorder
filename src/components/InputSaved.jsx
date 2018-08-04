@@ -1,6 +1,6 @@
 import React from 'react';
 import {Input} from "semantic-ui-react";
-import {LOCAL_DATA} from "../../LocalData";
+import {LOCAL_DATA} from "../singletons/LocalData";
 import PropTypes from 'prop-types';
 
 export default class InputSaved extends React.Component {

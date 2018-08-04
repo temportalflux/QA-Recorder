@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Form, Header, Modal, Tab} from "semantic-ui-react";
-import FileSystem from "../FileSystem";
+import FileSystem from "../singletons/FileSystem";
 import * as lodash from "lodash";
-import {LOCAL_DATA} from "../LocalData";
+import {LOCAL_DATA} from "../singletons/LocalData";
 import {SettingsModuleTarget} from "./SettingsModuleTarget";
 import {SettingsModuleObs} from "./SettingsModuleObs";
 import {SettingsModuleRecording} from "./SettingsModuleRecording";
 import {SettingsModuleStreaming} from "./SettingsModuleStreaming";
+import {SettingsModuleApplication} from "./SettingsModuleApplication";
 
 export class Settings extends React.Component {
 
@@ -48,6 +49,7 @@ export class Settings extends React.Component {
             isOpen: false,
             snapshot: undefined,
             categories: [
+                {title: 'Application', path: 'application', component: SettingsModuleApplication},
                 {title: 'Target', path: 'target', component: SettingsModuleTarget},
                 {title: 'OBS', path: 'obs', component: SettingsModuleObs},
                 {title: 'Recording', path: 'record', component: SettingsModuleRecording},
@@ -64,11 +66,11 @@ export class Settings extends React.Component {
     }
 
     componentDidMount() {
-        this.props.events.subscribe("openSettings", "settings", this._handleOpen);
+        this.props.events.subscribe("open|settings", "settings", this._handleOpen);
     }
 
     componentWillUnmount() {
-        this.props.events.unsubscribe("openSettings", "settings");
+        this.props.events.unsubscribe("open|settings", "settings");
     }
 
     _handleOpen() {

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Checkbox} from "semantic-ui-react";
-import {LOCAL_DATA} from "../../LocalData";
+import {LOCAL_DATA} from "../singletons/LocalData";
 import PropTypes from 'prop-types';
 
 export default class ToggleSaved extends React.Component {

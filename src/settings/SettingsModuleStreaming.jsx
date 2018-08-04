@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Form, Segment} from "semantic-ui-react";
-import ToggleSaved from "./components/ToggleSaved";
-import InputSaved from "./components/InputSaved";
+import ToggleSaved from "../components/ToggleSaved";
+import InputSaved from "../components/InputSaved";
 
 export const SettingsModuleStreaming = (props) => {
     return (

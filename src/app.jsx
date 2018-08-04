@@ -1,45 +1,72 @@
 import React from 'react';
 import {initMenu} from './AppMenu';
-import OBS from './OBS';
 import {Settings} from "./settings/Settings";
-import {EVENTS} from "./EventSystem";
+import {EVENTS} from "./singletons/EventSystem";
+import {Dimmer, Header, Loader, Segment} from "semantic-ui-react";
+import PanelLauncher from "./windows/PanelLauncher";
+import PanelViewer from "./windows/PanelViewer";
 
 export default class App extends React.Component {
 
     constructor(props) {
         super(props);
 
-        this._launchOBS = this._launchOBS.bind(this);
-
-        this.obs = new OBS();
-
         initMenu(EVENTS);
+
+        this.state = {
+            panel: undefined,
+        };
     }
 
     componentDidMount() {
-        let promise = Settings.loadSettings();
+        EVENTS.subscribe('open|launcher', 'app', () => {
+            if (this.state.panel !== 'launcher')
+                this.setState({ panel: 'launcher' });
+        });
+        EVENTS.subscribe('open|viewer', 'app', () => {
+            if (this.state.panel !== 'viewer')
+                this.setState({ panel: 'viewer' });
+        });
+
+        Settings.loadSettings().then(() => {
+            this.setState({ panel: 'launcher' });
+        });
     }
 
-    async _launchOBS() {
-        await this.obs.start();
-        setTimeout(() => { this.obs.stop(); }, 5000);
+    componentWillUnmount() {
+        EVENTS.unsubscribe('open|launcher', 'app');
+        EVENTS.unsubscribe('open|viewer', 'app');
     }
 
     render() {
-        /*
-
-                <Button onClick={this._launchOBS}>Launch</Button>
-                <Viewer />
-        */
         return (
             <div>
                 <Settings
                     events={EVENTS}
                 />
-
-                <h2>Welcome to React!</h2>
+                {this._renderPanel()}
             </div>
         );
+    }
+
+    _renderPanel() {
+        switch (this.state.panel) {
+            case 'launcher':
+                return <PanelLauncher path={'launch'} />;
+            case 'viewer':
+                return <PanelViewer path={'view'} />;
+            default:
+                return (
+                    <Dimmer active inverted>
+                        <Loader inverted>
+                            <Header as='h2' icon>
+                                Something is loading
+                                <Header.Subheader>Please be patient</Header.Subheader>
+                            </Header>
+                        </Loader>
+                    </Dimmer>
+                );
+        }
     }
 
 }

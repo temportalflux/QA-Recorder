@@ -1,10 +1,10 @@
 import React from 'react';
 import {Button, Checkbox, Input} from "semantic-ui-react";
 import {FaFolder} from "react-icons/fa";
-import FileSystem from "../../FileSystem";
+import FileSystem from "../singletons/FileSystem";
 import PropTypes from 'prop-types';
 import path from 'path';
-import {LOCAL_DATA} from "../../LocalData";
+import {LOCAL_DATA} from "../singletons/LocalData";
 import * as lodash from "lodash";
 
 export default class BrowseBar extends React.Component {

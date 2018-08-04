@@ -7,8 +7,11 @@ export function initMenu(events) {
             submenu: [
                 {
                     label: 'Settings',
-                    click: () => { events.dispatch("openSettings"); },
-                }
+                    click: () => { events.dispatch("open|settings"); },
+                },
+                {type: 'separator'},
+                {role: 'minimize'},
+                {role: 'close'},
             ]
         },
         {
@@ -26,10 +29,16 @@ export function initMenu(events) {
         {
             role: 'window',
             submenu: [
-                {role: 'minimize'},
-                {role: 'close'},
-                {type: 'separator'},
                 {role: 'togglefullscreen'},
+                {type: 'separator'},
+                {
+                    label: 'Open Launcher',
+                    click: () => { events.dispatch("open|launcher"); },
+                },
+                {
+                    label: 'Open Viewer',
+                    click: () => { events.dispatch("open|viewer"); },
+                },
             ]
         },
         {

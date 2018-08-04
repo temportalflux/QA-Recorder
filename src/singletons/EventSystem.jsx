@@ -25,11 +25,15 @@ class EventSystem {
     }
 
     dispatch(event, data) {
-        let pathCurrent = [];
-        for (const pathEntry of lodash.toPath(event)) {
-            pathCurrent.push(pathEntry);
-            let handlers = lodash.get(this.events, pathCurrent, {});
-            lodash.values(handlers).forEach((handler) => handler(data));
+        let currentPath = lodash.toPath(event);
+        while (currentPath.length > 0) {
+            let handlers = lodash.get(this.events, currentPath, {});
+            lodash.values(handlers).forEach((handlerOrObject) => {
+                if (typeof handlerOrObject === 'function') {
+                    handlerOrObject(data);
+                }
+            });
+            currentPath.pop();
         }
     }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Form} from "semantic-ui-react";
-import ExecutableSaved from "./components/ExecutableSaved";
+import ExecutableSaved from "../components/ExecutableSaved";
 
 export const SettingsModuleTarget = (props) => {
     return (

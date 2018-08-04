@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Form} from "semantic-ui-react";
-import ExecutableSaved from "./components/ExecutableSaved";
-import BrowseBar from "./components/BrowseBar";
-import InputSaved from "./components/InputSaved";
+import ExecutableSaved from "../components/ExecutableSaved";
+import BrowseBar from "../components/BrowseBar";
+import InputSaved from "../components/InputSaved";
 
 export const SettingsModuleObs = (props) => {
     return (

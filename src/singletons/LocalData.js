@@ -27,12 +27,13 @@ class LocalData {
 
     set(path, value) {
         lodash.set(this.data, path, value);
-        let currentPath = [];
-        for (const pathEntry of lodash.toPath(path))
+        let currentPath = lodash.toPath(path);
+        while (currentPath.length > 0)
         {
-            currentPath.push(pathEntry);
             EVENTS.dispatch(this._getEventKey(currentPath), value);
+            currentPath.pop();
         }
+        // TODO: this probably doesn't account for all the possible children of value that may have changed.
         return value;
     }
 
