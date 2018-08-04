@@ -4,7 +4,7 @@ import BrowseBar from "./BrowseBar";
 import PropTypes from 'prop-types';
 import * as shortid from "shortid";
 
-export default class ExecutableSettings extends React.Component {
+export default class ExecutableSaved extends React.Component {
 
     constructor(props) {
         super(props);
@@ -42,7 +42,7 @@ export default class ExecutableSettings extends React.Component {
     _renderUnix() {
         return (
             <BrowseBar
-                saveKey={`${this.props.saveKey}.unix`}
+                path={`${this.props.path}.unix`}
             />
         );
     }
@@ -53,7 +53,7 @@ export default class ExecutableSettings extends React.Component {
                 filters={[
                     {name: 'Application', extensions: ['app']},
                 ]}
-                saveKey={`${this.props.saveKey}.osx`}
+                path={`${this.props.path}.osx`}
             />
         );
     }
@@ -73,7 +73,7 @@ export default class ExecutableSettings extends React.Component {
                     filters={[
                         {name: 'Executable', extensions: ['exe']},
                     ]}
-                    saveKey={`${this.props.saveKey}.windows32`}
+                    path={`${this.props.path}.windows32`}
                 />
             </Tab.Pane>
         );
@@ -86,7 +86,7 @@ export default class ExecutableSettings extends React.Component {
                     filters={[
                         {name: 'Executable', extensions: ['exe']},
                     ]}
-                    saveKey={`${this.props.saveKey}.windows64`}
+                    path={`${this.props.path}.windows64`}
                 />
             </Tab.Pane>
         );
@@ -94,9 +94,9 @@ export default class ExecutableSettings extends React.Component {
 
 }
 
-ExecutableSettings.defaultProps = {
+ExecutableSaved.defaultProps = {
 
 };
-ExecutableSettings.propTypes = {
-    saveKey: PropTypes.string.isRequired,
+ExecutableSaved.propTypes = {
+    path: PropTypes.string.isRequired,
 };

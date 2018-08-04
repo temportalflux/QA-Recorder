@@ -1,14 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Form, Header, Modal} from "semantic-ui-react";
-import FileSystem from "./FileSystem";
+import {Button, Form, Header, Modal, Tab} from "semantic-ui-react";
+import FileSystem from "../FileSystem";
 import * as lodash from "lodash";
-import {LOCAL_DATA} from "./LocalData";
-import ExecutableSettings from "./settings/ExecutableSettings";
+import {LOCAL_DATA} from "../LocalData";
+import {SettingsModuleTarget} from "./SettingsModuleTarget";
+import {SettingsModuleObs} from "./SettingsModuleObs";
+import {SettingsModuleRecording} from "./SettingsModuleRecording";
+import {SettingsModuleStreaming} from "./SettingsModuleStreaming";
 
 export class Settings extends React.Component {
 
-    static getSettings() { return LOCAL_DATA.get('settings', {}); }
+    static getSettings() {
+        return LOCAL_DATA.get('settings', {});
+    }
 
     static async loadSettings() {
         let exists = await FileSystem.existsRelative('config.json');
@@ -42,6 +47,19 @@ export class Settings extends React.Component {
         this.state = {
             isOpen: false,
             snapshot: undefined,
+            categories: [
+                {title: 'Target', path: 'target', component: SettingsModuleTarget},
+                {title: 'OBS', path: 'obs', component: SettingsModuleObs},
+                {title: 'Recording', path: 'record', component: SettingsModuleRecording},
+                {title: 'Streaming', path: 'stream', component: SettingsModuleStreaming},
+            ].map((tab) => {
+                return {
+                    menuItem: tab.title,
+                    render: () => React.createElement(tab.component, {
+                        path: `settings.${tab.path}`
+                    }),
+                };
+            }),
         };
     }
 
@@ -89,7 +107,7 @@ export class Settings extends React.Component {
                 open={this.state.isOpen}
                 onClose={this._handleClose}
             >
-                <Header icon='save' content='Settings' />
+                <Header icon='save' content='Settings'/>
                 <Modal.Content scrolling>
                     {this._renderSettings()}
                 </Modal.Content>
@@ -108,14 +126,9 @@ export class Settings extends React.Component {
     _renderSettings() {
         return (
             <Form>
-
-                <Form.Field>
-                    <label>Target Executable</label>
-                    <ExecutableSettings
-                        saveKey={`settings.target`}
-                    />
-                </Form.Field>
-
+                <Tab
+                    panes={this.state.categories}
+                />
             </Form>
         );
     }

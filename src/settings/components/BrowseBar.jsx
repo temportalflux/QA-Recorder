@@ -1,10 +1,11 @@
 import React from 'react';
-import {Button, Checkbox, Form, Input} from "semantic-ui-react";
+import {Button, Checkbox, Input} from "semantic-ui-react";
 import {FaFolder} from "react-icons/fa";
-import FileSystem from "../FileSystem";
+import FileSystem from "../../FileSystem";
 import PropTypes from 'prop-types';
 import path from 'path';
-import {LOCAL_DATA} from "../LocalData";
+import {LOCAL_DATA} from "../../LocalData";
+import * as lodash from "lodash";
 
 export default class BrowseBar extends React.Component {
 
@@ -16,8 +17,8 @@ export default class BrowseBar extends React.Component {
         this._handleToggleRelative = this._handleToggleRelative.bind(this);
         this._setPath = this._setPath.bind(this);
 
-        let pathValue = LOCAL_DATA.get(`${this.props.saveKey}.path`, '');
-        let isRelative = LOCAL_DATA.get(`${this.props.saveKey}.relative`, false);
+        let pathValue = LOCAL_DATA.get(`${this.props.path}.path`, '');
+        let isRelative = LOCAL_DATA.get(`${this.props.path}.relative`, false);
         this.state = {
             value: !isRelative ? pathValue : path.resolve(FileSystem.cwd(), pathValue),
             isRelative: isRelative,
@@ -30,11 +31,11 @@ export default class BrowseBar extends React.Component {
     }
 
     async _handleBrowse() {
-        let options = {
+        let options = lodash.defaults(this.props.options, {
             title: 'Executable File',
             defaultPath: this.state.value || FileSystem.cwd(),
             properties: [ 'openFile' ],
-        };
+        });
         if (this.props.filters !== undefined) {
             options.filters = this.props.filters;
         }
@@ -45,7 +46,7 @@ export default class BrowseBar extends React.Component {
     _handleToggleRelative(e, {checked}) {
         if (checked !== this.state.isRelative) {
             this._setPath(this.state.value, checked);
-            LOCAL_DATA.set(`${this.props.saveKey}.relative`, checked);
+            LOCAL_DATA.set(`${this.props.path}.relative`, checked);
         }
         this.setState({
             isRelative: checked,
@@ -58,12 +59,12 @@ export default class BrowseBar extends React.Component {
         if (isRelative) {
             value = path.relative(FileSystem.cwd(), value);
         }
-        LOCAL_DATA.set(`${this.props.saveKey}.path`, value);
+        LOCAL_DATA.set(`${this.props.path}.path`, value);
     }
 
     render() {
         return (
-            <Form.Group>
+            <div>
                 <Input
                     labelPosition={'right'}
                     label={<Button onClick={this._handleBrowse}><FaFolder /></Button>}
@@ -75,19 +76,20 @@ export default class BrowseBar extends React.Component {
                     checked={this.state.isRelative}
                     onChange={this._handleToggleRelative}
                 />
-            </Form.Group>
+            </div>
         );
     }
 
 }
 
 BrowseBar.defaultProps = {
+    options: {},
     filters: [],
 };
 
 BrowseBar.propTypes = {
+    options: PropTypes.object,
     filters: PropTypes.array,
 
-    saveKey: PropTypes.string.isRequired,
-
+    path: PropTypes.string.isRequired,
 };

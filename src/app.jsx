@@ -1,7 +1,7 @@
 import React from 'react';
 import {initMenu} from './AppMenu';
 import OBS from './OBS';
-import {Settings} from "./Settings";
+import {Settings} from "./settings/Settings";
 import {EVENTS} from "./EventSystem";
 
 export default class App extends React.Component {
