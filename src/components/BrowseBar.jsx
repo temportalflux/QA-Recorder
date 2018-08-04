@@ -34,13 +34,15 @@ export default class BrowseBar extends React.Component {
         let options = lodash.defaults(this.props.options, {
             title: 'Executable File',
             defaultPath: this.state.value || FileSystem.cwd(),
-            properties: [ 'openFile' ],
+            properties: ['openFile'],
         });
         if (this.props.filters !== undefined) {
             options.filters = this.props.filters;
         }
         let filePaths = await FileSystem.displayDialog(options);
-        this._setPath(filePaths[0], this.state.isRelative);
+        if (filePaths !== undefined && Array.isArray(filePaths) && filePaths.length > 0) {
+            this._setPath(filePaths[0], this.state.isRelative);
+        }
     }
 
     _handleToggleRelative(e, {checked}) {

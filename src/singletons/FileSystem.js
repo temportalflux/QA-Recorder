@@ -7,7 +7,7 @@ import * as lodash from "lodash";
 export default class FileSystem {
 
     static cwd() {
-        return path.normalize(remote.app.getAppPath());
+        return path.normalize(remote.app.getPath('userData'));
     }
 
     static exists(filePath) {
