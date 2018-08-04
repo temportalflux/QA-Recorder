@@ -43,5 +43,4 @@ before_script:
 - sleep 3
 
 script:
-- npm run dist
-# electron-forge package ./ --arch=win64 --platform=win64
+- npm run build
