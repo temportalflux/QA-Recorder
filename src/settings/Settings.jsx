@@ -1,19 +1,54 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {Button, Form, Header, Modal, Tab} from "semantic-ui-react";
 import FileSystem from "../singletons/FileSystem";
 import * as lodash from "lodash";
-import {LOCAL_DATA} from "../singletons/LocalData";
-import {SettingsModuleTarget} from "./SettingsModuleTarget";
+import {SettingsModuleTester} from "./SettingsModuleTester";
 import {SettingsModuleObs} from "./SettingsModuleObs";
 import {SettingsModuleRecording} from "./SettingsModuleRecording";
 import {SettingsModuleStreaming} from "./SettingsModuleStreaming";
 import {SettingsModuleApplication} from "./SettingsModuleApplication";
+import {GetLocalData} from "../singletons/LocalData";
+import {GetEvents} from "../singletons/EventSystem";
+
+export const FILENAME_FORMATS = {
+    obs: [
+        { key: '%Y or %CCYY', description: 'Year, 4-digit' },
+        { key: '%y or %YY', description: 'Year, last 2-digits' },
+        { key: '%m or %MM', description: 'Month (1-12)' },
+        { key: '%b', description: 'Short month name (JAN-DEC)' },
+        { key: '%B', description: 'Long month name (January-December)' },
+        { key: '%d or %DD', description: 'Day (01-31)' },
+        { key: '%a', description: 'Short day name (SUN-SAT)' },
+        { key: '%A', description: 'Long day name (Sunday-Saturday)' },
+        { key: '%I', description: 'Hour (1-12)' },
+        { key: '%H or %hh', description: 'Hour (00-23)' },
+        { key: '%mm or %M', description: 'Minute (00-59)' },
+        { key: '%ss or %S', description: 'Second (00-59)' },
+        { key: '%p', description: 'AM or PM' },
+        { key: '%z', description: 'ISO 8601 offset from UTC' },
+        { key: '%Z', description: 'Timezone' },
+        { key: '%%', description: 'The % sign' },
+    ],
+    custom: [
+        {
+            key: 'name', path: 'settings.application.name', defaultValue: '',
+            description: 'Application name',
+        },
+        {
+            key: 'tester', path: 'settings.tester.name', defaultValue: '',
+            description: 'Tester name',
+        },
+        {
+            key: 'tester#', path: 'settings.tester.number', defaultValue: 0,
+            description: 'Tester number',
+        },
+    ],
+};
 
 export class Settings extends React.Component {
 
     static getSettings() {
-        return LOCAL_DATA.get('settings', {});
+        return GetLocalData().get('settings', {});
     }
 
     static async loadSettings() {
@@ -26,7 +61,7 @@ export class Settings extends React.Component {
         else {
             await Settings.saveSystemSettings();
         }
-        settings = LOCAL_DATA.set('settings', lodash.defaultsDeep(loadedData, settings));
+        settings = GetLocalData().set('settings', lodash.defaultsDeep(loadedData, settings));
         console.log("Loaded system settings", settings);
     }
 
@@ -49,8 +84,8 @@ export class Settings extends React.Component {
             isOpen: false,
             snapshot: undefined,
             categories: [
+                {title: 'Tester', path: 'tester', component: SettingsModuleTester},
                 {title: 'Application', path: 'application', component: SettingsModuleApplication},
-                {title: 'Target', path: 'target', component: SettingsModuleTarget},
                 {title: 'OBS', path: 'obs', component: SettingsModuleObs},
                 {title: 'Recording', path: 'record', component: SettingsModuleRecording},
                 {title: 'Streaming', path: 'stream', component: SettingsModuleStreaming},
@@ -66,11 +101,11 @@ export class Settings extends React.Component {
     }
 
     componentDidMount() {
-        this.props.events.subscribe("open|settings", "settings", this._handleOpen);
+        GetEvents().subscribe("open|settings", "settings", this._handleOpen);
     }
 
     componentWillUnmount() {
-        this.props.events.unsubscribe("open|settings", "settings");
+        GetEvents().unsubscribe("open|settings", "settings");
     }
 
     _handleOpen() {
@@ -87,7 +122,7 @@ export class Settings extends React.Component {
     }
 
     _handleCancel() {
-        LOCAL_DATA.set('settings', this.state.snapshot);
+        GetLocalData().set('settings', this.state.snapshot);
         this.setState({
             isOpen: false,
             snapshot: undefined,
@@ -135,12 +170,24 @@ export class Settings extends React.Component {
         );
     }
 
+    static getFilenameFormatting() {
+        let filename = GetLocalData().get(`settings.record.filename`, '');
+
+        // TODO: Move to a central place with the other formats
+        filename = FILENAME_FORMATS.custom.reduce((filenameFormat, keyPath) => {
+            return filenameFormat.replace(
+                new RegExp(`%${keyPath.key}`, 'g'),
+                GetLocalData().get(keyPath.path, keyPath.defaultValue)
+            );
+        }, filename);
+
+        return filename;
+    }
+
 }
 
 Settings.defaultProps = {
-    events: {},
 };
 
 Settings.propTypes = {
-    events: PropTypes.object.isRequired,
 };

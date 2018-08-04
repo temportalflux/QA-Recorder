@@ -1,49 +1,51 @@
 import React from 'react';
 import {initMenu} from './AppMenu';
 import {Settings} from "./settings/Settings";
-import {EVENTS} from "./singletons/EventSystem";
-import {Dimmer, Header, Loader, Segment} from "semantic-ui-react";
+import {Dimmer, Header, Loader} from "semantic-ui-react";
 import PanelLauncher from "./windows/PanelLauncher";
 import PanelViewer from "./windows/PanelViewer";
+import FileSystem from "./singletons/FileSystem";
+import {GetEvents} from "./singletons/EventSystem";
 
-export default class App extends React.Component {
+export class App extends React.Component {
 
     constructor(props) {
         super(props);
 
-        initMenu(EVENTS);
+        initMenu(GetEvents());
 
         this.state = {
             panel: undefined,
         };
+
     }
 
     componentDidMount() {
-        EVENTS.subscribe('open|launcher', 'app', () => {
+        console.log("Loaded app with data path", FileSystem.cwd());
+
+        GetEvents().subscribe('open|launcher', 'app', () => {
             if (this.state.panel !== 'launcher')
-                this.setState({ panel: 'launcher' });
+                this.setState({panel: 'launcher'});
         });
-        EVENTS.subscribe('open|viewer', 'app', () => {
+        GetEvents().subscribe('open|viewer', 'app', () => {
             if (this.state.panel !== 'viewer')
-                this.setState({ panel: 'viewer' });
+                this.setState({panel: 'viewer'});
         });
 
         Settings.loadSettings().then(() => {
-            this.setState({ panel: 'launcher' });
+            this.setState({panel: 'launcher'});
         });
     }
 
     componentWillUnmount() {
-        EVENTS.unsubscribe('open|launcher', 'app');
-        EVENTS.unsubscribe('open|viewer', 'app');
+        GetEvents().unsubscribe('open|launcher', 'app');
+        GetEvents().unsubscribe('open|viewer', 'app');
     }
 
     render() {
         return (
             <div>
-                <Settings
-                    events={EVENTS}
-                />
+                <Settings />
                 {this._renderPanel()}
             </div>
         );
@@ -52,9 +54,9 @@ export default class App extends React.Component {
     _renderPanel() {
         switch (this.state.panel) {
             case 'launcher':
-                return <PanelLauncher path={'launch'} />;
+                return <PanelLauncher path={'launch'}/>;
             case 'viewer':
-                return <PanelViewer path={'view'} />;
+                return <PanelViewer path={'view'}/>;
             default:
                 return (
                     <Dimmer active inverted>

@@ -1,7 +1,7 @@
 import * as lodash from "lodash";
-import {EVENTS} from "./EventSystem";
+import {GetEvents} from "./EventSystem";
 
-class LocalData {
+export class LocalData {
 
     constructor() {
         this._getEventKey = this._getEventKey.bind(this);
@@ -18,11 +18,11 @@ class LocalData {
     }
 
     subscribe(path, handle, func) {
-        EVENTS.subscribe(this._getEventKey(lodash.toPath(path)), handle, func);
+        GetEvents().subscribe(this._getEventKey(lodash.toPath(path)), handle, func);
     }
 
     unsubscribe(path, handle) {
-        EVENTS.unsubscribe(this._getEventKey(lodash.toPath(path)), handle);
+        GetEvents().unsubscribe(this._getEventKey(lodash.toPath(path)), handle);
     }
 
     set(path, value) {
@@ -30,7 +30,7 @@ class LocalData {
         let currentPath = lodash.toPath(path);
         while (currentPath.length > 0)
         {
-            EVENTS.dispatch(this._getEventKey(currentPath), value);
+            GetEvents().dispatch(this._getEventKey(currentPath), value);
             currentPath.pop();
         }
         // TODO: this probably doesn't account for all the possible children of value that may have changed.
@@ -44,4 +44,7 @@ class LocalData {
 
 }
 
-export const LOCAL_DATA  = new LocalData();
+export const LOCAL_DATA = new LocalData(); // TODO: when system soft-reloads, statics are reloaded. Move this to an electron global
+export function GetLocalData() {
+    return LOCAL_DATA;
+}

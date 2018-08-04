@@ -1,6 +1,6 @@
 import * as lodash from "lodash";
 
-class EventSystem {
+export class EventSystem {
 
     constructor() {
         this.events = {};
@@ -39,4 +39,7 @@ class EventSystem {
 
 }
 
-export const EVENTS = new EventSystem();
+export const EVENTS = new EventSystem(); // TODO: when system soft-reloads, statics are reloaded. Move this to an electron global
+export function GetEvents() {
+    return EVENTS;
+}

@@ -4,7 +4,7 @@ import {FaFolder} from "react-icons/fa";
 import FileSystem from "../singletons/FileSystem";
 import PropTypes from 'prop-types';
 import path from 'path';
-import {LOCAL_DATA} from "../singletons/LocalData";
+import {GetLocalData} from "../singletons/LocalData";
 import * as lodash from "lodash";
 
 export default class BrowseBar extends React.Component {
@@ -17,8 +17,8 @@ export default class BrowseBar extends React.Component {
         this._handleToggleRelative = this._handleToggleRelative.bind(this);
         this._setPath = this._setPath.bind(this);
 
-        let pathValue = LOCAL_DATA.get(`${this.props.path}.path`, '');
-        let isRelative = LOCAL_DATA.get(`${this.props.path}.relative`, false);
+        let pathValue = GetLocalData().get(`${this.props.path}.path`, '');
+        let isRelative = GetLocalData().get(`${this.props.path}.relative`, false);
         this.state = {
             value: !isRelative ? pathValue : path.resolve(FileSystem.cwd(), pathValue),
             isRelative: isRelative,
@@ -31,9 +31,11 @@ export default class BrowseBar extends React.Component {
     }
 
     async _handleBrowse() {
+        let currentValue = GetLocalData().get(this.props.path);
+        let startLocation = currentValue ? FileSystem.resolvePotentialRelative(currentValue) : FileSystem.appData();
         let options = lodash.defaults(this.props.options, {
             title: 'Executable File',
-            defaultPath: this.state.value || FileSystem.cwd(),
+            defaultPath: startLocation,
             properties: ['openFile'],
         });
         if (this.props.filters !== undefined) {
@@ -48,7 +50,7 @@ export default class BrowseBar extends React.Component {
     _handleToggleRelative(e, {checked}) {
         if (checked !== this.state.isRelative) {
             this._setPath(this.state.value, checked);
-            LOCAL_DATA.set(`${this.props.path}.relative`, checked);
+            GetLocalData().set(`${this.props.path}.relative`, checked);
         }
         this.setState({
             isRelative: checked,
@@ -61,7 +63,7 @@ export default class BrowseBar extends React.Component {
         if (isRelative) {
             value = path.relative(FileSystem.cwd(), value);
         }
-        LOCAL_DATA.set(`${this.props.path}.path`, value);
+        GetLocalData().set(`${this.props.path}.path`, value);
     }
 
     render() {
