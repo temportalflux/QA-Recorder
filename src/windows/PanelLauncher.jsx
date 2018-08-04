@@ -1,11 +1,11 @@
 import React from 'react';
 import {Button, Header, Segment} from "semantic-ui-react";
-import LocalDataText from "../components/LocalDataText";
+import LocalDataDisplay from "../components/LocalDataDisplay";
 import OBSInterface from "../applications/OBSInterface";
 import {GetLocalData} from "../singletons/LocalData";
 import CreateApplicationController from "../applications/CreateApplicationController";
 
-const STATUS = Object.freeze(Object.keys({
+export const LAUNCHER_STATUS = Object.freeze(Object.keys({
     AWAITING_LAUNCH: 0,
     LOADING_OBS_SETTINGS_FILES: 0,
     LAUNCHING_OBS: 0,
@@ -18,13 +18,13 @@ const STATUS = Object.freeze(Object.keys({
     STOP_STREAMING: 0,
     REMOVE_OBS_SETTINGS_FILES: 0,
     CLOSING_OBS: 0,
-}).reduce((states, key, i) => { states[key] = i; return states; }, {}));
-const STATUS_ARRAY = Object.freeze((Object.keys(STATUS).map((key) => key)));
+    SESSION_COMPLETE: 0,
+}).reduce((states, key, i) => { states[key] = key; return states; }, {}));
 
 export default class PanelLauncher extends React.Component {
 
     static setStatus(status) {
-        GetLocalData().set('launcher.state', STATUS_ARRAY[status]);
+        GetLocalData().set('launcher.state', status);
     }
 
     constructor(props) {
@@ -33,12 +33,14 @@ export default class PanelLauncher extends React.Component {
         this.launch = this.launch.bind(this);
         this.onTargetClose = this.onTargetClose.bind(this);
         this.onStateChanged = this.onStateChanged.bind(this);
-        this.renderPanel = this.renderPanel.bind(this);
+        this.reset = this.reset.bind(this);
+        this.renderLauncherStateAsStatus = this.renderLauncherStateAsStatus.bind(this);
+        this.renderLauncherStateAsPanel = this.renderLauncherStateAsPanel.bind(this);
 
         this.obs = null;
         this.target = null;
 
-        PanelLauncher.setStatus(STATUS.AWAITING_LAUNCH);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
     }
 
     componentDidMount() {
@@ -58,47 +60,51 @@ export default class PanelLauncher extends React.Component {
         });
 
         // GOTTA IMPORT THOSE ASSETS
-        PanelLauncher.setStatus(STATUS.LOADING_OBS_SETTINGS_FILES);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.LOADING_OBS_SETTINGS_FILES);
         await this.obs.addFileSettings();
 
-        PanelLauncher.setStatus(STATUS.LAUNCHING_OBS);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.LAUNCHING_OBS);
         await this.obs.start();
 
-        PanelLauncher.setStatus(STATUS.LOADING_OBS_SETTINGS);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.LOADING_OBS_SETTINGS);
         await this.obs.loadFromSettings();
 
-        PanelLauncher.setStatus(STATUS.LAUNCHING_TARGET);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.LAUNCHING_TARGET);
         await this.target.spawn();
 
-        PanelLauncher.setStatus(STATUS.START_RECORDING);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.START_RECORDING);
         await this.obs.startRecording();
 
-        PanelLauncher.setStatus(STATUS.START_STREAMING);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.START_STREAMING);
         await this.obs.startStreaming();
 
-        PanelLauncher.setStatus(STATUS.AWAITING_GAME_CLOSE);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.AWAITING_GAME_CLOSE);
     }
 
     async onTargetClose() {
         this.target = null;
 
-        PanelLauncher.setStatus(STATUS.STOP_RECORDING);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.STOP_RECORDING);
         await this.obs.stopRecording();
 
-        PanelLauncher.setStatus(STATUS.STOP_STREAMING);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.STOP_STREAMING);
         await this.obs.stopStreaming();
 
-        PanelLauncher.setStatus(STATUS.CLOSING_OBS);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.CLOSING_OBS);
         this.obs.stop();
 
-        PanelLauncher.setStatus(STATUS.REMOVE_OBS_SETTINGS_FILES);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.REMOVE_OBS_SETTINGS_FILES);
         await this.obs.removeFileSettings();
 
-        PanelLauncher.setStatus(STATUS.AWAITING_LAUNCH);
+        PanelLauncher.setStatus(LAUNCHER_STATUS.SESSION_COMPLETE);
     }
 
     onStateChanged(state) {
         console.log(state);
+    }
+
+    async reset() {
+        PanelLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
     }
 
     render() {
@@ -107,33 +113,134 @@ export default class PanelLauncher extends React.Component {
         return (
             <div>
                 <Header size={'large'} textAlign='center'>
-                    Welcome to <LocalDataText path={'settings.application.name'}/>!
-                    <Header.Subheader>Lets get started!</Header.Subheader>
+                    Welcome to <LocalDataDisplay path={'settings.application.name'}/>!
+                    <Header.Subheader>
+                        <LocalDataDisplay
+                            path={'launcher.state'}
+                            parseValue={this.renderLauncherStateAsStatus}
+                        />
+                    </Header.Subheader>
                 </Header>
                 <Segment>
-                    {this.renderPanel()}
+                    <LocalDataDisplay
+                        path={'launcher.state'}
+                        parseValue={this.renderLauncherStateAsPanel}
+                    />
                 </Segment>
             </div>
         );
     }
 
-    renderPanel() {
-        return (
-            <div>
-                <Header size={'medium'} textAlign='center'>
-                    Launch the game to get started!
-                </Header>
-                <Button
-                    fluid
-                    size='massive'
-                    color='green'
-                    attached='bottom'
-                    onClick={this.launch}
-                >
-                    Launch
-                </Button>
-            </div>
-        );
+    renderLauncherStateAsStatus(state) {
+        let text;
+        switch (state) {
+            case LAUNCHER_STATUS.LOADING_OBS_SETTINGS_FILES:
+            case LAUNCHER_STATUS.LAUNCHING_OBS:
+            case LAUNCHER_STATUS.LOADING_OBS_SETTINGS:
+            case LAUNCHER_STATUS.LAUNCHING_TARGET:
+                text = 'Loading applications...';
+                break;
+            case LAUNCHER_STATUS.START_RECORDING:
+            case LAUNCHER_STATUS.START_STREAMING:
+            case LAUNCHER_STATUS.AWAITING_GAME_CLOSE:
+            case LAUNCHER_STATUS.STOP_RECORDING:
+            case LAUNCHER_STATUS.STOP_STREAMING:
+                let recording = GetLocalData().get('settings.record.enabled', false);
+                let streaming = GetLocalData().get('settings.stream.enabled', false);
+                let activities = [];
+                if (recording) activities.push('Recording');
+                if (streaming) activities.push('Streaming');
+                if (activities.length === 0) activities.push("I'm not doing anything. Why have you started me?");
+                text = activities.join(' and ');
+                break;
+            case LAUNCHER_STATUS.REMOVE_OBS_SETTINGS_FILES:
+            case LAUNCHER_STATUS.CLOSING_OBS:
+                text = 'Closing applications...';
+                break;
+            case LAUNCHER_STATUS.SESSION_COMPLETE:
+                text = 'Hope you enjoyed your play session ;D';
+                break;
+            case LAUNCHER_STATUS.AWAITING_LAUNCH:
+            default:
+                text = 'Lets get started!';
+                break;
+        }
+        return <label>{text}</label>;
+    }
+
+    renderLauncherStateAsPanel(state) {
+        switch (state) {
+            case LAUNCHER_STATUS.LOADING_OBS_SETTINGS_FILES:
+            case LAUNCHER_STATUS.LAUNCHING_OBS:
+            case LAUNCHER_STATUS.LOADING_OBS_SETTINGS:
+            case LAUNCHER_STATUS.LAUNCHING_TARGET:
+                return (
+                    <div>
+                        <Header size={'medium'} textAlign='center'>
+                            Loading your game
+                        </Header>
+                    </div>
+                );
+            case LAUNCHER_STATUS.START_RECORDING:
+            case LAUNCHER_STATUS.START_STREAMING:
+            case LAUNCHER_STATUS.AWAITING_GAME_CLOSE:
+                return (
+                    <div>
+                        <Header size={'medium'} textAlign='center'>
+                            Enjoy your play session!
+                        </Header>
+                    </div>
+                );
+            case LAUNCHER_STATUS.STOP_RECORDING:
+            case LAUNCHER_STATUS.STOP_STREAMING:
+            case LAUNCHER_STATUS.REMOVE_OBS_SETTINGS_FILES:
+            case LAUNCHER_STATUS.CLOSING_OBS:
+                return (
+                    <div>
+                        <Header size={'medium'} textAlign='center'>
+                            Welcome back! Processing your play session...
+                        </Header>
+                    </div>
+                );
+            case LAUNCHER_STATUS.SESSION_COMPLETE:
+                return (
+                    <div>
+                        <Header size={'medium'} textAlign='center'>
+                            Welcome back! I hope you enjoyed our game.
+                        </Header>
+
+                        TODO: Post play
+
+                        <Button
+                            fluid
+                            size='small'
+                            color='green'
+                            attached='bottom'
+                            onClick={this.reset}
+                        >
+                            Reset
+                        </Button>
+                    </div>
+                );
+            case LAUNCHER_STATUS.AWAITING_LAUNCH:
+            default:
+                return (
+                    <div>
+                        <Header size={'medium'} textAlign='center'>
+                            Launch the game to get started!
+                        </Header>
+                        <Button
+                            fluid
+                            size='massive'
+                            color='green'
+                            attached='bottom'
+                            onClick={this.launch}
+                        >
+                            Launch
+                        </Button>
+                    </div>
+                );
+        }
     }
 
 }

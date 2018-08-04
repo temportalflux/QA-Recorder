@@ -19,4 +19,5 @@ SettingsModuleTester.defaultProps = {
 
 SettingsModuleTester.propTypes = {
     path: PropTypes.string.isRequired,
+    shouldBeDisabled: PropTypes.func.isRequired,
 };

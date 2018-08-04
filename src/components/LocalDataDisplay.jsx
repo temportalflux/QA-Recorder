@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {GetLocalData} from "../singletons/LocalData";
 import * as shortid from "shortid";
 
-export default class LocalDataText extends React.Component {
+export default class LocalDataDisplay extends React.Component {
 
     constructor(props) {
         super(props);
@@ -31,13 +31,18 @@ export default class LocalDataText extends React.Component {
     }
 
     render() {
-        return <label>{this.getValue()}</label>;
+        return this.props.parseValue(this.getValue());
     }
 
 }
 
-LocalDataText.defaultProps = {};
+LocalDataDisplay.defaultProps = {
+    parseValue: (value) => <label>{value}</label>,
+};
 
-LocalDataText.propTypes = {
-    path: PropTypes.string.isRequired
+LocalDataDisplay.propTypes = {
+    path: PropTypes.string.isRequired,
+
+    parseValue: PropTypes.func,
+
 };

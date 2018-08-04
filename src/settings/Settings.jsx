@@ -9,6 +9,7 @@ import {SettingsModuleStreaming} from "./SettingsModuleStreaming";
 import {SettingsModuleApplication} from "./SettingsModuleApplication";
 import {GetLocalData} from "../singletons/LocalData";
 import {GetEvents} from "../singletons/EventSystem";
+import {LAUNCHER_STATUS} from "../windows/PanelLauncher";
 
 export const FILENAME_FORMATS = {
     obs: [
@@ -74,15 +75,17 @@ export class Settings extends React.Component {
     constructor(props) {
         super(props);
 
-        this._handleOpen = this._handleOpen.bind(this);
-        this._handleClose = this._handleClose.bind(this);
-        this._handleCancel = this._handleCancel.bind(this);
-        this._handleSaveAndClose = this._handleSaveAndClose.bind(this);
-        this._renderSettings = this._renderSettings.bind(this);
+        this.handleOpen = this.handleOpen.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+        this.handleSaveAndClose = this.handleSaveAndClose.bind(this);
+        this.handleChangeInLauncherState = this.handleChangeInLauncherState.bind(this);
+        this.renderSettings = this.renderSettings.bind(this);
 
         this.state = {
             isOpen: false,
             snapshot: undefined,
+            launcherIsRunning: false,
             categories: [
                 {title: 'Tester', path: 'tester', component: SettingsModuleTester},
                 {title: 'Application', path: 'application', component: SettingsModuleApplication},
@@ -93,7 +96,8 @@ export class Settings extends React.Component {
                 return {
                     menuItem: tab.title,
                     render: () => React.createElement(tab.component, {
-                        path: `settings.${tab.path}`
+                        path: `settings.${tab.path}`,
+                        shouldBeDisabled: () => this.state.launcherIsRunning,
                     }),
                 };
             }),
@@ -101,27 +105,29 @@ export class Settings extends React.Component {
     }
 
     componentDidMount() {
-        GetEvents().subscribe("open|settings", "settings", this._handleOpen);
+        GetEvents().subscribe("open|settings", "settings", this.handleOpen);
+        GetLocalData().subscribe('launcher.state', 'settings', this.handleChangeInLauncherState);
     }
 
     componentWillUnmount() {
         GetEvents().unsubscribe("open|settings", "settings");
+        GetLocalData().unsubscribe('launcher.state', 'settings');
     }
 
-    _handleOpen() {
+    handleOpen() {
         this.setState({
             isOpen: true,
             snapshot: this.state.snapshot || lodash.cloneDeep(Settings.getSettings()),
         });
     }
 
-    _handleClose() {
+    handleClose() {
         this.setState({
             isOpen: false,
         });
     }
 
-    _handleCancel() {
+    handleCancel() {
         GetLocalData().set('settings', this.state.snapshot);
         this.setState({
             isOpen: false,
@@ -129,7 +135,7 @@ export class Settings extends React.Component {
         });
     }
 
-    _handleSaveAndClose() {
+    handleSaveAndClose() {
         let promise = Settings.saveSystemSettings();
         this.setState({
             isOpen: false,
@@ -137,22 +143,30 @@ export class Settings extends React.Component {
         });
     }
 
+    handleChangeInLauncherState(state) {
+        let launcherIsRunning = state !== LAUNCHER_STATUS.AWAITING_LAUNCH;
+        if (launcherIsRunning !== this.state.launcherIsRunning)
+        {
+            this.setState({ launcherIsRunning: launcherIsRunning });
+        }
+    }
+
     render() {
         return (
             <Modal
                 trigger={<div/>}
                 open={this.state.isOpen}
-                onClose={this._handleClose}
+                onClose={this.handleClose}
             >
                 <Header icon='save' content='Settings'/>
                 <Modal.Content scrolling>
-                    {this._renderSettings()}
+                    {this.renderSettings()}
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button color='red' onClick={this._handleCancel} secondary>
+                    <Button color='red' onClick={this.handleCancel} secondary disabled={this.state.launcherIsRunning}>
                         Cancel
                     </Button>
-                    <Button color='green' onClick={this._handleSaveAndClose} primary>
+                    <Button color='green' onClick={this.handleSaveAndClose} primary disabled={this.state.launcherIsRunning}>
                         Save
                     </Button>
                 </Modal.Actions>
@@ -160,7 +174,7 @@ export class Settings extends React.Component {
         );
     }
 
-    _renderSettings() {
+    renderSettings() {
         return (
             <Form>
                 <Tab

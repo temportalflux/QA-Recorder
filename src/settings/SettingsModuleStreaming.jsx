@@ -8,28 +8,28 @@ export const SettingsModuleStreaming = (props) => {
     return (
         <div>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <ToggleSaved
                     path={`${props.path}.enabled`}
                     label={'Enabled'}
                 />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Server</label>
                 <InputSaved
                     path={`${props.path}.server`}
                 />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Stream Key</label>
                 <InputSaved
                     path={`${props.path}.key`}
                 />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Authentication</label>
                 {/* TODO: Move this to a component (AuthenticationSaved) */}
                 <Segment>
@@ -66,4 +66,5 @@ SettingsModuleStreaming.defaultProps = {
 
 SettingsModuleStreaming.propTypes = {
     path: PropTypes.string.isRequired,
+    shouldBeDisabled: PropTypes.func.isRequired,
 };

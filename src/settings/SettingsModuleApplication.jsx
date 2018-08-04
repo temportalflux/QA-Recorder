@@ -8,12 +8,12 @@ export const SettingsModuleApplication = (props) => {
     return (
         <div>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Name</label>
                 <InputSaved path={`${props.path}.name`} />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Target Executable</label>
                 <ExecutableSaved
                     path={`${props.path}.executable`}
@@ -28,4 +28,5 @@ SettingsModuleApplication.defaultProps = {};
 
 SettingsModuleApplication.propTypes = {
     path: PropTypes.string.isRequired,
+    shouldBeDisabled: PropTypes.func.isRequired,
 };

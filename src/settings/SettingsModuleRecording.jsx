@@ -40,14 +40,14 @@ export const SettingsModuleRecording = (props) => {
     return (
         <div>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <ToggleSaved
                     path={`${props.path}.enabled`}
                     label={'Enabled'}
                 />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Output Folder</label>
                 <BrowseBar
                     path={`${props.path}.outputDirectory`}
@@ -58,7 +58,7 @@ export const SettingsModuleRecording = (props) => {
                 />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Filename Format</label>
                 <InputSaved
                     path={`${props.path}.filename`}
@@ -97,4 +97,5 @@ SettingsModuleRecording.defaultProps = {
 
 SettingsModuleRecording.propTypes = {
     path: PropTypes.string.isRequired,
+    shouldBeDisabled: PropTypes.func.isRequired,
 };

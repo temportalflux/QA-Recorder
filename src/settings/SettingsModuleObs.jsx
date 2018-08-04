@@ -8,14 +8,14 @@ import InputSaved from "../components/InputSaved";
 export const SettingsModuleObs = (props) => {
     return (
         <div>
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Executable</label>
                 <ExecutableSaved
                     path={`${props.path}.executable`}
                 />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Profile</label>
                 <BrowseBar
                     options={{
@@ -26,7 +26,7 @@ export const SettingsModuleObs = (props) => {
                 />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Scene Collection</label>
                 <BrowseBar
                     filters={[
@@ -36,7 +36,7 @@ export const SettingsModuleObs = (props) => {
                 />
             </Form.Field>
 
-            <Form.Field>
+            <Form.Field disabled={props.shouldBeDisabled()}>
                 <label>Scene Name</label>
                 <InputSaved
                     path={`${props.path}.sceneName`}
@@ -53,4 +53,5 @@ SettingsModuleObs.defaultProps = {
 
 SettingsModuleObs.propTypes = {
     path: PropTypes.string.isRequired,
+    shouldBeDisabled: PropTypes.func.isRequired,
 };
