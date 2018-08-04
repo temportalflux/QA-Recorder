@@ -1,0 +1,3 @@
+[submodule "recordings"]
+	path = recordings
+	url = D:\\Desktop\\QA-Recorder-React\\recordings
