@@ -1,3 +1,4 @@
+# https://bretahajek.com/2016/11/electron-builder-appveyor-travis-ci-memory-king/
 os: unstable
 cache:
 - node_modules
