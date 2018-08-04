@@ -11,7 +11,7 @@ export default class ToggleSaved extends React.Component {
         this._handleChange = this._handleChange.bind(this);
 
         this.state = {
-            value: LOCAL_DATA.get(this.props.path, ''),
+            value: LOCAL_DATA.get(this.props.path, false),
         };
     }
 
