@@ -42,6 +42,10 @@ export class LocalData {
         return lodash.get(this.data, path, defaultValue);
     }
 
+    update(path, defaultValue, doUpdate) {
+        this.set(path, doUpdate(this.get(path, defaultValue)));
+    }
+
 }
 
 export const LOCAL_DATA = new LocalData(); // TODO: when system soft-reloads, statics are reloaded. Move this to an electron global

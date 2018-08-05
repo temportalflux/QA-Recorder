@@ -106,6 +106,7 @@ export default class PanelLauncher extends React.Component {
     }
 
     async reset() {
+        this.GetLocalData().update("settings.tester.number", 0, (value) => value + 1);
         PanelLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
     }
 
