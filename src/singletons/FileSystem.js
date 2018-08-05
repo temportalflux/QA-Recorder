@@ -14,6 +14,27 @@ export default class FileSystem {
         return path.normalize(remote.app.getPath('appData'));
     }
 
+    static resolvePlatformPath(pathObject) {
+        switch (process.platform) {
+            case 'aix':
+            case 'freebsd':
+            case 'linux':
+            case 'openbsd':
+            case 'sunos':
+                pathObject = pathObject['linux'];
+                break;
+            case 'darwin':
+                pathObject = pathObject['osx'];
+                break;
+            case 'win32':
+                pathObject = pathObject[process.arch === 'x64' ? 'windows64' : 'windows32'];
+                break;
+            default:
+                break;
+        }
+        return FileSystem.resolvePotentialRelative(pathObject);
+    }
+
     static resolvePotentialRelative(pathObject) {
         return pathObject.isRelative ? path.resolve(FileSystem.cwd(), pathObject.path) : pathObject.path;
     }

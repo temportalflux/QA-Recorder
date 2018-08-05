@@ -8,14 +8,14 @@ export default class InputSaved extends React.Component {
     constructor(props) {
         super(props);
 
-        this._handleChange = this._handleChange.bind(this);
+        this.handleChange = this.handleChange.bind(this);
 
         this.state = {
             value: GetLocalData().get(this.props.path, this.defaultValue || ''),
         };
     }
 
-    _handleChange(e, data) {
+    handleChange(e, data) {
         GetLocalData().set(this.props.path, data.value);
         this.setState({ value: data.value });
     }
@@ -24,7 +24,7 @@ export default class InputSaved extends React.Component {
         return (
             <Input
                 value={this.state.value}
-                onChange={this._handleChange}
+                onChange={this.handleChange}
             />
         );
     }

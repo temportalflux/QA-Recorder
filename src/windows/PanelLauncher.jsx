@@ -4,6 +4,8 @@ import LocalDataDisplay from "../components/LocalDataDisplay";
 import OBSInterface from "../applications/OBSInterface";
 import {GetLocalData} from "../singletons/LocalData";
 import CreateApplicationController from "../applications/CreateApplicationController";
+import FileSystem from "../singletons/FileSystem";
+import path from "path";
 
 export const LAUNCHER_STATUS = Object.freeze(Object.keys({
     AWAITING_LAUNCH: 0,

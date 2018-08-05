@@ -10,6 +10,7 @@ import {SettingsModuleApplication} from "./SettingsModuleApplication";
 import {GetLocalData} from "../singletons/LocalData";
 import {GetEvents} from "../singletons/EventSystem";
 import {LAUNCHER_STATUS} from "../windows/PanelLauncher";
+import path from 'path';
 
 export const FILENAME_FORMATS = {
     obs: [
@@ -42,6 +43,15 @@ export const FILENAME_FORMATS = {
         {
             key: 'tester#', path: 'settings.tester.number', defaultValue: 0,
             description: 'Tester number',
+        },
+        {
+            key: 'appFile', description: 'Executable file name',
+            defaultValue: 0,
+            path: 'settings.application.executable',
+            parseValue: (value) => {
+                value = FileSystem.resolvePlatformPath(value);
+                return path.basename(value, path.extname(value));
+            },
         },
     ],
 };
@@ -187,12 +197,12 @@ export class Settings extends React.Component {
     static getFilenameFormatting() {
         let filename = GetLocalData().get(`settings.record.filename`, '');
 
-        // TODO: Move to a central place with the other formats
         filename = FILENAME_FORMATS.custom.reduce((filenameFormat, keyPath) => {
-            return filenameFormat.replace(
-                new RegExp(`%${keyPath.key}`, 'g'),
-                GetLocalData().get(keyPath.path, keyPath.defaultValue)
-            );
+            let value = GetLocalData().get(keyPath.path, keyPath.defaultValue);
+            if (keyPath.parseValue) {
+                value = keyPath.parseValue(value);
+            }
+            return filenameFormat.replace(new RegExp(`%${keyPath.key}`, 'g'), value);
         }, filename);
 
         return filename;
