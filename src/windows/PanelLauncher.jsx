@@ -6,6 +6,7 @@ import {GetLocalData} from "../singletons/LocalData";
 import CreateApplicationController from "../applications/CreateApplicationController";
 import FileSystem from "../singletons/FileSystem";
 import path from "path";
+import DynamicFrame from "../components/DynamicFrame";
 
 export const LAUNCHER_STATUS = Object.freeze(Object.keys({
     AWAITING_LAUNCH: 0,
@@ -212,7 +213,19 @@ export default class PanelLauncher extends React.Component {
                             Welcome back! I hope you enjoyed our game.
                         </Header>
 
-                        TODO: Post play
+                        <LocalDataDisplay
+                            path={`settings.tester.formLink`}
+                            defaultValue={undefined}
+                            parseValue={(value) => {
+                                if (!value) return <div/>;
+                                return (
+                                    <DynamicFrame
+                                        fluid
+                                        src={value}
+                                    />
+                                );
+                            }}
+                        />
 
                         <Button
                             fluid
@@ -232,6 +245,7 @@ export default class PanelLauncher extends React.Component {
                         <Header size={'medium'} textAlign='center'>
                             Launch the game to get started!
                         </Header>
+
                         <Button
                             fluid
                             size='massive'

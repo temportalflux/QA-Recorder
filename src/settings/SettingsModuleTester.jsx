@@ -21,6 +21,11 @@ export const SettingsModuleTester = (props) => {
                 />
             </Form.Field>
 
+            <Form.Field disabled={props.shouldBeDisabled()}>
+                <label>Form Link</label>
+                <InputSaved path={`${props.path}.formLink`} />
+            </Form.Field>
+
         </div>
     );
 };

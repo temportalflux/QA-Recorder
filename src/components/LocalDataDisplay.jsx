@@ -17,7 +17,7 @@ export default class LocalDataDisplay extends React.Component {
     }
 
     getValue() {
-        return GetLocalData().get(this.props.path, 'null');
+        return GetLocalData().get(this.props.path, this.props.defaultValue);
     }
 
     componentDidMount() {
@@ -38,11 +38,13 @@ export default class LocalDataDisplay extends React.Component {
 
 LocalDataDisplay.defaultProps = {
     parseValue: (value) => <label>{value}</label>,
+    defaultValue: undefined,
 };
 
 LocalDataDisplay.propTypes = {
     path: PropTypes.string.isRequired,
 
     parseValue: PropTypes.func,
+    defaultValue: PropTypes.object,
 
 };

@@ -6,6 +6,7 @@ import PanelLauncher from "./windows/PanelLauncher";
 import PanelViewer from "./windows/PanelViewer";
 import FileSystem from "./singletons/FileSystem";
 import {GetEvents} from "./singletons/EventSystem";
+import {Loading} from "./components/Loading";
 
 export class App extends React.Component {
 
@@ -59,14 +60,12 @@ export class App extends React.Component {
                 return <PanelViewer path={'view'}/>;
             default:
                 return (
-                    <Dimmer active inverted>
-                        <Loader inverted>
-                            <Header as='h2' icon>
-                                Something is loading
-                                <Header.Subheader>Please be patient</Header.Subheader>
-                            </Header>
-                        </Loader>
-                    </Dimmer>
+                    <Loading>
+                        <Header as='h2' icon>
+                            Something is loading
+                            <Header.Subheader>Please be patient</Header.Subheader>
+                        </Header>
+                    </Loading>
                 );
         }
     }

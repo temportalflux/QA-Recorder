@@ -21,7 +21,6 @@ export default class NumericInputSaved extends React.Component {
     }
 
     render() {
-        console.log(this.props);
         return (
             <NumericInput
                 strict
