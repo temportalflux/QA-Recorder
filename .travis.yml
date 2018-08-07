@@ -4,13 +4,6 @@ dist: trusty
 
 language: c
 
-matrix:
-  include:
-  - os: osx
-  - os: linux
-    env: CC=clang CXX=clang++ npm_config_clang=1
-    compiler: clang
-
 node_js:
 - 7
 
@@ -48,6 +41,14 @@ script:
 
 jobs:
   include:
+  - stage: compile
+    name: "osx"
+    os: osx
+  - stage: compile
+    name: "linux"
+    os: linux
+    env: CC=clang CXX=clang++ npm_config_clang=1
+    compiler: clang
   - stage: deploy
     name: "Deploy to gh-pages"
     script: ./deployDocs
