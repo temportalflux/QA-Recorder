@@ -24,15 +24,17 @@ addons:
     - xorriso
     - xvfb
 
+install:
+- nvm install 7
+- npm install
+
 jobs:
   include:
   - stage: compile
     name: "osx"
     os: osx
     install:
-    - nvm install 7
     - npm install electron-builder@next
-    - npm install
     - export DISPLAY=':99.0'
     - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
     before_script:
@@ -46,9 +48,7 @@ jobs:
     env: CC=clang CXX=clang++ npm_config_clang=1
     compiler: clang
     install:
-    - nvm install 7
     - npm install electron-builder@next
-    - npm install
     - export DISPLAY=':99.0'
     - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
     before_script:
@@ -58,4 +58,8 @@ jobs:
     script: npm run build
   - stage: deploy
     name: "Deploy to gh-pages"
-    script: bash ./deployDocs.sh
+    before_install:
+    - cd docs
+    script:
+    - npm run buildDocs
+    - npm run deploy
