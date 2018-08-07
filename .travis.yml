@@ -12,7 +12,7 @@ matrix:
     compiler: clang
 
 node_js:
-- 6
+- 7
 
 cache:
   directories:
@@ -45,3 +45,9 @@ before_script:
 
 script:
 - npm run build
+
+jobs:
+  include:
+  - stage: deploy
+    name: "Deploy to gh-pages"
+    script: ./deployDocs
