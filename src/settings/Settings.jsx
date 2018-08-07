@@ -24,8 +24,8 @@ export const FILENAME_FORMATS = {
         { key: '%A', description: 'Long day name (Sunday-Saturday)' },
         { key: '%I', description: 'Hour (1-12)' },
         { key: '%H or %hh', description: 'Hour (00-23)' },
-        { key: '%mm or %M', description: 'Minute (00-59)' },
-        { key: '%ss or %S', description: 'Second (00-59)' },
+        { key: '%M or %mm', description: 'Minute (00-59)' },
+        { key: '%S or %ss', description: 'Second (00-59)' },
         { key: '%p', description: 'AM or PM' },
         { key: '%z', description: 'ISO 8601 offset from UTC' },
         { key: '%Z', description: 'Timezone' },
@@ -41,7 +41,7 @@ export const FILENAME_FORMATS = {
             description: 'Tester name',
         },
         {
-            key: 'tester#', path: 'settings.tester.number', defaultValue: 0,
+            key: 'test#', path: 'settings.tester.number', defaultValue: 0,
             description: 'Tester number',
         },
         {
@@ -195,7 +195,7 @@ export class Settings extends React.Component {
     }
 
     static getFilenameFormatting() {
-        let filename = GetLocalData().get(`settings.record.filename`, '');
+        let filename = GetLocalData().get(`settings.record.filename`, '%Y-%m-%d_%H-%M-%S_%Z');
 
         filename = FILENAME_FORMATS.custom.reduce((filenameFormat, keyPath) => {
             let value = GetLocalData().get(keyPath.path, keyPath.defaultValue);

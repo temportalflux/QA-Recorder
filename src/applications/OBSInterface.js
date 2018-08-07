@@ -71,18 +71,23 @@ export default class OBSInterface {
     }
 
     async addFileSettingsProfile() {
-        let { profilePathSrc, profilePathDirDest, profilePathDest } = this.getProfilePathSet();
+        let set = this.getProfilePathSet();
+        if (set === undefined) return;
+        let { profilePathSrc, profilePathDirDest, profilePathDest } = set;
         await FileSystem.ensureDirectoryExists(profilePathDest);
         await FileSystem.copyTo(path.resolve(profilePathSrc, 'basic.ini'), profilePathDest);
     }
 
     async removeFileSettingsProfile() {
-        let { profilePathSrc, profilePathDirDest, profilePathDest } = this.getProfilePathSet();
+        let set = this.getProfilePathSet();
+        if (set === undefined) return;
+        let { profilePathSrc, profilePathDirDest, profilePathDest } = set;
         await FileSystem.remove(profilePathDirDest);
     }
 
     getProfilePathSet() {
         let profilePathSrc = this.getProfilePath();
+        if (profilePathSrc === undefined) return undefined;
         let profilePathDirDest = path.resolve(this.getSettingsPathProfiles(), this.getProfileName());
         let profilePathDest = path.resolve(profilePathDirDest, 'basic.ini');
         return {
@@ -93,26 +98,33 @@ export default class OBSInterface {
     }
 
     getProfileName() {
-        return path.basename(this.getProfilePath());
+        let profilePath = this.getProfilePath();
+        return profilePath !== undefined ? path.basename(profilePath) : undefined;
     }
 
     getProfilePath() {
-        return FileSystem.resolvePotentialRelative(GetLocalData().get('settings.obs.profile'));
+        let pathSettings = GetLocalData().get('settings.obs.profile');
+        return pathSettings !== undefined ? FileSystem.resolvePotentialRelative(pathSettings): undefined;
     }
 
     async addFileSettingsScenes() {
-        let { sceneCollectionPathSrc, sceneCollectionPathDest } = this.getSceneCollectionPathSet();
+        let set = this.getSceneCollectionPathSet();
+        if (set === undefined) return;
+        let { sceneCollectionPathSrc, sceneCollectionPathDest } = set;
         await FileSystem.copyTo(sceneCollectionPathSrc, sceneCollectionPathDest);
     }
 
     async removeFileSettingsScenes() {
-        let { sceneCollectionPathSrc, sceneCollectionPathDest } = this.getSceneCollectionPathSet();
+        let set = this.getSceneCollectionPathSet();
+        if (set === undefined) return;
+        let { sceneCollectionPathSrc, sceneCollectionPathDest } = set;
         await FileSystem.remove(sceneCollectionPathDest);
         await FileSystem.remove(sceneCollectionPathDest + '.bak');
     }
 
     getSceneCollectionPathSet() {
         let sceneCollectionPathSrc = this.getSceneCollectionPath();
+        if (sceneCollectionPathSrc === undefined) return undefined;
         let sceneCollectionPathDest = path.resolve(this.getSettingsPathScenes(), this.getSceneCollectionName());
         return {
             sceneCollectionPathSrc: sceneCollectionPathSrc,
@@ -121,11 +133,14 @@ export default class OBSInterface {
     }
 
     getSceneCollectionName(ext) {
-        return path.basename(this.getSceneCollectionPath(), ext);
+        let pathSettings = this.getSceneCollectionPath();
+        return pathSettings !== undefined ? path.basename(pathSettings, ext) : undefined;
     }
 
     getSceneCollectionPath() {
-        return FileSystem.resolvePotentialRelative(GetLocalData().get('settings.obs.sceneCollection'));
+        let pathSettings = GetLocalData().get('settings.obs.sceneCollection');
+        if (pathSettings === undefined) return undefined;
+        return FileSystem.resolvePotentialRelative(pathSettings);
     }
 
     async start() {
@@ -171,10 +186,15 @@ export default class OBSInterface {
         return response;
     }
 
+    async ezRequest(requestName, key, value) {
+        if (value === undefined) return;
+        await this.request(requestName, { [key]: value });
+    }
+
     async loadFromSettings() {
-        await this.request('SetCurrentProfile', { 'profile-name': this.getProfileName() });
-        await this.request('SetCurrentSceneCollection', { 'sc-name': this.getSceneCollectionName('.json') });
-        await this.request('SetCurrentScene', { 'scene-name': GetLocalData().get('settings.obs.sceneName') });
+        await this.ezRequest('SetCurrentProfile', 'profile-name', this.getProfileName());
+        await this.ezRequest('SetCurrentSceneCollection', 'sc-name', this.getSceneCollectionName('.json'));
+        await this.ezRequest('SetCurrentScene', 'scene-name', GetLocalData().get('settings.obs.sceneName'));
         await this.loadFromSettingsRecord();
         await this.loadFromSettingsStream();
     }
@@ -182,7 +202,7 @@ export default class OBSInterface {
     async loadFromSettingsRecord() {
         let rootKey = 'settings.record';
         //let enabled = GetLocalData().get(`${rootKey}.enabled`);
-        let outputDir = FileSystem.resolvePotentialRelative(GetLocalData().get(`${rootKey}.outputDirectory`));
+        let outputDir = FileSystem.resolvePotentialRelative(GetLocalData().get(`${rootKey}.outputDirectory`, {path: FileSystem.appData()}));
         await this.request('SetRecordingFolder', { 'rec-folder': outputDir });
         await this.request('SetFilenameFormatting', { 'filename-formatting': Settings.getFilenameFormatting() });
     }

@@ -4,8 +4,6 @@ import LocalDataDisplay from "../components/LocalDataDisplay";
 import OBSInterface from "../applications/OBSInterface";
 import {GetLocalData} from "../singletons/LocalData";
 import CreateApplicationController from "../applications/CreateApplicationController";
-import FileSystem from "../singletons/FileSystem";
-import path from "path";
 import DynamicFrame from "../components/DynamicFrame";
 
 export const LAUNCHER_STATUS = Object.freeze(Object.keys({
@@ -107,7 +105,7 @@ export default class PanelLauncher extends React.Component {
     }
 
     async reset() {
-        this.GetLocalData().update("settings.tester.number", 0, (value) => value + 1);
+        GetLocalData().update("settings.tester.number", 0, (value) => value + 1);
         PanelLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
     }
 
