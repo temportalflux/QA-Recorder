@@ -47,6 +47,10 @@ export const SettingsModuleObs = (props) => {
     );
 };
 
+SettingsModuleObs.title = "OBS";
+SettingsModuleObs.path = "obs";
+SettingsModuleObs.component = SettingsModuleObs;
+
 SettingsModuleObs.defaultProps = {
 
 };

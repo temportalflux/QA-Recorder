@@ -91,6 +91,10 @@ export const SettingsModuleRecording = (props) => {
     );
 };
 
+SettingsModuleRecording.title = "Recording";
+SettingsModuleRecording.path = "record";
+SettingsModuleRecording.component = SettingsModuleRecording;
+
 SettingsModuleRecording.defaultProps = {
 
 };

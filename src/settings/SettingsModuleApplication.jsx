@@ -24,6 +24,10 @@ export const SettingsModuleApplication = (props) => {
     );
 };
 
+SettingsModuleApplication.title = "Application";
+SettingsModuleApplication.path = "application";
+SettingsModuleApplication.component = SettingsModuleApplication;
+
 SettingsModuleApplication.defaultProps = {};
 
 SettingsModuleApplication.propTypes = {

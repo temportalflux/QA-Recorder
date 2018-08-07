@@ -21,16 +21,16 @@ export class EventSystem {
             throw new Error(`Handle ${handle} does not exist for event ${event}.`);
         }
         delete handles[handle];
-        lodash.set(this.events, event);
+        lodash.set(this.events, event, handles);
     }
 
-    dispatch(event, data) {
+    dispatch(event, ...data) {
         let currentPath = lodash.toPath(event);
         while (currentPath.length > 0) {
             let handlers = lodash.get(this.events, currentPath, {});
             lodash.values(handlers).forEach((handlerOrObject) => {
                 if (typeof handlerOrObject === 'function') {
-                    handlerOrObject(data);
+                    handlerOrObject(...data);
                 }
             });
             currentPath.pop();

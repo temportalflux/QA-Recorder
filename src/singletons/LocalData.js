@@ -30,7 +30,7 @@ export class LocalData {
         let currentPath = lodash.toPath(path);
         while (currentPath.length > 0)
         {
-            GetEvents().dispatch(this._getEventKey(currentPath), value);
+            GetEvents().dispatch(this._getEventKey(currentPath), value, path);
             currentPath.pop();
         }
         // TODO: this probably doesn't account for all the possible children of value that may have changed.

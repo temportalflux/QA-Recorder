@@ -6,12 +6,20 @@ import fsextra from 'fs-extra';
 
 export default class FileSystem {
 
+    static getPath(key) {
+        return path.normalize(remote.app.getPath(key));
+    }
+
     static cwd() {
-        return path.normalize(remote.app.getPath('userData'));
+        return FileSystem.getPath('userData');
     }
 
     static appData() {
-        return path.normalize(remote.app.getPath('appData'));
+        return FileSystem.getPath('appData');
+    }
+
+    static desktop() {
+        return FileSystem.getPath('desktop');
     }
 
     static resolvePlatformPath(pathObject) {
@@ -86,6 +94,13 @@ export default class FileSystem {
         return new Promise((resolve) => {
             remote.dialog.showOpenDialog(options, resolve);
         });
+    }
+
+    static displaySaveDialog(options) {
+        options = lodash.defaultsDeep(options, {});
+        return new Promise((resolve) => {
+            remote.dialog.showSaveDialog(options, resolve);
+        })
     }
 
     static chmodWrite(filePath) {

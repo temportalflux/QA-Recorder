@@ -11,6 +11,10 @@ import {GetLocalData} from "../singletons/LocalData";
 import {GetEvents} from "../singletons/EventSystem";
 import {LAUNCHER_STATUS} from "../windows/PanelLauncher";
 import path from 'path';
+import {FaDownload, FaFile, FaSave, FaSync, FaTimes, FaUpload} from "react-icons/fa/index";
+import * as shortid from "shortid";
+import {SettingsDisplay} from "./SettingsDisplay";
+import {SettingsBtnChangeSensitive} from "./SettingsBtnChangeSensitive";
 
 export const FILENAME_FORMATS = {
     obs: [
@@ -62,66 +66,70 @@ export class Settings extends React.Component {
         return GetLocalData().get('settings', {});
     }
 
+    static setSettings(settings) {
+        return GetLocalData().set('settings', settings);
+    }
+
     static async loadSettings() {
         let exists = await FileSystem.existsRelative('config.json');
-        let settings = Settings.getSettings();
-        let loadedData = settings;
         if (exists) {
-            loadedData = JSON.parse(await FileSystem.readFileRelative('config.json'));
+            await Settings.importSystemSettings(path.join(FileSystem.cwd(), 'config.json'));
         }
         else {
             await Settings.saveSystemSettings();
         }
-        settings = GetLocalData().set('settings', lodash.defaultsDeep(loadedData, settings));
+    }
+
+    static async importSystemSettings(filePath) {
+        let settings = Settings.getSettings();
+        let loadedData = JSON.parse(await FileSystem.readFile(filePath));
+        settings = Settings.setSettings(lodash.defaultsDeep(loadedData, settings));
         console.log("Loaded system settings", settings);
+        GetEvents().dispatch("settings|import");
     }
 
     static async saveSystemSettings() {
+        await Settings.exportSystemSettings(path.join(FileSystem.cwd(), 'config.json'));
+    }
+
+    static async exportSystemSettings(filePath) {
         let settings = Settings.getSettings();
-        console.log("Saving system settings", settings);
-        await FileSystem.writeFileRelative('config.json', JSON.stringify(settings, undefined, 4));
+        console.log("Saving system settings to", filePath, settings);
+        await FileSystem.writeFile(filePath, JSON.stringify(settings, undefined, 4));
     }
 
     constructor(props) {
         super(props);
 
         this.handleOpen = this.handleOpen.bind(this);
+        this.handleChangeInLauncherState = this.handleChangeInLauncherState.bind(this);
+        this.handleChangeInField = this.handleChangeInField.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.handleSaveAndClose = this.handleSaveAndClose.bind(this);
-        this.handleChangeInLauncherState = this.handleChangeInLauncherState.bind(this);
+        this.handleExport = this.handleExport.bind(this);
+        this.handleImport = this.handleImport.bind(this);
+        this.handleReset = this.handleReset.bind(this);
         this.renderSettings = this.renderSettings.bind(this);
 
         this.state = {
             isOpen: false,
             snapshot: undefined,
             launcherIsRunning: false,
-            categories: [
-                {title: 'Tester', path: 'tester', component: SettingsModuleTester},
-                {title: 'Application', path: 'application', component: SettingsModuleApplication},
-                {title: 'OBS', path: 'obs', component: SettingsModuleObs},
-                {title: 'Recording', path: 'record', component: SettingsModuleRecording},
-                {title: 'Streaming', path: 'stream', component: SettingsModuleStreaming},
-            ].map((tab) => {
-                return {
-                    menuItem: tab.title,
-                    render: () => React.createElement(tab.component, {
-                        path: `settings.${tab.path}`,
-                        shouldBeDisabled: () => this.state.launcherIsRunning,
-                    }),
-                };
-            }),
         };
+        this.changedFields = {};
     }
 
     componentDidMount() {
         GetEvents().subscribe("open|settings", "settings", this.handleOpen);
         GetLocalData().subscribe('launcher.state', 'settings', this.handleChangeInLauncherState);
+        GetLocalData().subscribe('settings', 'settings', this.handleChangeInField);
     }
 
     componentWillUnmount() {
         GetEvents().unsubscribe("open|settings", "settings");
         GetLocalData().unsubscribe('launcher.state', 'settings');
+        GetLocalData().unsubscribe('settings', 'settings');
     }
 
     handleOpen() {
@@ -161,6 +169,56 @@ export class Settings extends React.Component {
         }
     }
 
+    handleChangeInField(value, pathKey) {
+        if (!pathKey.startsWith('settings.')) return;
+
+        let hasChangedFields = () => !lodash.isEmpty(this.changedFields);
+        let hadChangedFields = hasChangedFields();
+
+        let snapshotValue = lodash.get(this.state.snapshot, pathKey.substring('settings.'.length), undefined);
+        let valueMatchesSnapshot = lodash.isEqual(value, snapshotValue);
+        if (!valueMatchesSnapshot)
+        {
+            this.changedFields[pathKey] = !valueMatchesSnapshot;
+        }
+        else if (this.changedFields.hasOwnProperty(pathKey)) {
+            delete this.changedFields[pathKey];
+        }
+
+        let hasChangedFieldsAfterUpdate = hasChangedFields();
+        if (hasChangedFieldsAfterUpdate !== hadChangedFields) {
+            GetEvents().dispatch('settings|hasChangedFields', hasChangedFieldsAfterUpdate, this.changedFields);
+        }
+    }
+
+    async handleExport() {
+        let filePath = await FileSystem.displaySaveDialog({
+            title: 'Export File',
+            defaultPath: FileSystem.desktop(),
+            filters: [{name: 'JSON', extensions: ['json']}],
+        });
+        if (!filePath) return;
+        await Settings.exportSystemSettings(filePath);
+    }
+
+    async handleImport() {
+        let filePath = await FileSystem.displayDialog({
+            title: 'Export File',
+            defaultPath: FileSystem.desktop(),
+            filters: [{name: 'JSON', extensions: ['json']}],
+            properties: ['openFile'],
+        });
+        if (!filePath[0]) return;
+        await Settings.importSystemSettings(filePath[0], Settings.getSettings());
+        await Settings.saveSystemSettings();
+    }
+
+    async handleReset() {
+        Settings.setSettings({});
+        GetEvents().dispatch("settings|import");
+        await Settings.saveSystemSettings();
+    }
+
     render() {
         return (
             <Modal
@@ -168,17 +226,38 @@ export class Settings extends React.Component {
                 open={this.state.isOpen}
                 onClose={this.handleClose}
             >
-                <Header icon='save' content='Settings'/>
+                <Header>
+                    <FaSave /> Settings
+                    <SettingsBtnChangeSensitive
+                        uniqueKey={'cancel'}
+                        disabled={this.state.launcherIsRunning}
+                        onClick={this.handleCancel}
+                        secondary floated={'right'} size={'mini'}
+                    >
+                        &times;
+                    </SettingsBtnChangeSensitive>
+                </Header>
                 <Modal.Content scrolling>
                     {this.renderSettings()}
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button color='red' onClick={this.handleCancel} secondary disabled={this.state.launcherIsRunning}>
-                        Cancel
+                    <Button onClick={this.handleReset} disabled={this.state.launcherIsRunning} color='red'>
+                        Reset <FaSync />
                     </Button>
-                    <Button color='green' onClick={this.handleSaveAndClose} primary disabled={this.state.launcherIsRunning}>
-                        Save
+                    <Button onClick={this.handleImport} disabled={this.state.launcherIsRunning}>
+                        Import <FaUpload />
                     </Button>
+                    <Button onClick={this.handleExport} disabled={this.state.launcherIsRunning}>
+                        Export <FaDownload />
+                    </Button>
+                    <SettingsBtnChangeSensitive
+                        uniqueKey={'save'}
+                        disabled={this.state.launcherIsRunning}
+                        onClick={this.handleSaveAndClose}
+                        primary
+                    >
+                        Save <FaSave />
+                    </SettingsBtnChangeSensitive>
                 </Modal.Actions>
             </Modal>
         );
@@ -186,11 +265,7 @@ export class Settings extends React.Component {
 
     renderSettings() {
         return (
-            <Form>
-                <Tab
-                    panes={this.state.categories}
-                />
-            </Form>
+            <SettingsDisplay launcherIsRunning={this.state.launcherIsRunning}/>
         );
     }
 

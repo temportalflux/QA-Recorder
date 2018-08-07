@@ -60,6 +60,10 @@ export const SettingsModuleStreaming = (props) => {
     );
 };
 
+SettingsModuleStreaming.title = "Streaming";
+SettingsModuleStreaming.path = "stream";
+SettingsModuleStreaming.component = SettingsModuleStreaming;
+
 SettingsModuleStreaming.defaultProps = {
 
 };
