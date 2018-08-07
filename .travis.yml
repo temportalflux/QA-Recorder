@@ -58,6 +58,7 @@ jobs:
     name: "Deploy to gh-pages"
     before_install:
     - cd docs
+    - npm install react-docgen -g
     script:
     - npm run buildDocs
     - npm run deploy
