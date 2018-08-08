@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "gh-pages": "^1.2.0",
-    "install": "^0.12.1"
+    "install": "^0.12.1",
+    "react-docgen": "^2.21.0"
   }
 }

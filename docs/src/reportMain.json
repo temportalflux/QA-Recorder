@@ -1,5 +1,5 @@
 {
-  "..\\src\\components\\AccordionStateful.jsx": {
+  "../src/components/AccordionStateful.jsx": {
     "description": "",
     "displayName": "AccordionStateful",
     "methods": [
@@ -21,7 +21,7 @@
       }
     ]
   },
-  "..\\src\\components\\BrowseBar.jsx": {
+  "../src/components/BrowseBar.jsx": {
     "description": "",
     "displayName": "BrowseBar",
     "methods": [
@@ -115,7 +115,7 @@
       }
     }
   },
-  "..\\src\\components\\DynamicFrame.jsx": {
+  "../src/components/DynamicFrame.jsx": {
     "description": "",
     "displayName": "DynamicFrame",
     "methods": [
@@ -170,7 +170,7 @@
       }
     }
   },
-  "..\\src\\components\\ExecutableSaved.jsx": {
+  "../src/components/ExecutableSaved.jsx": {
     "description": "",
     "displayName": "ExecutableSaved",
     "methods": [
@@ -220,7 +220,7 @@
       }
     }
   },
-  "..\\src\\components\\InputSaved.jsx": {
+  "../src/components/InputSaved.jsx": {
     "description": "",
     "displayName": "InputSaved",
     "methods": [
@@ -262,12 +262,12 @@
       }
     }
   },
-  "..\\src\\components\\Loading.jsx": {
+  "../src/components/Loading.jsx": {
     "description": "",
     "displayName": "Loading",
     "methods": []
   },
-  "..\\src\\components\\LocalDataDisplay.jsx": {
+  "../src/components/LocalDataDisplay.jsx": {
     "description": "",
     "displayName": "LocalDataDisplay",
     "methods": [
@@ -311,7 +311,7 @@
       }
     }
   },
-  "..\\src\\components\\NumericInputSaved.jsx": {
+  "../src/components/NumericInputSaved.jsx": {
     "description": "",
     "displayName": "NumericInputSaved",
     "methods": [
@@ -404,7 +404,7 @@
       }
     }
   },
-  "..\\src\\components\\ToggleSaved.jsx": {
+  "../src/components/ToggleSaved.jsx": {
     "description": "",
     "displayName": "ToggleSaved",
     "methods": [

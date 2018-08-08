@@ -1,5 +1,5 @@
 {
-  "src\\components\\DocsApp.jsx": {
+  "src/components/DocsApp.jsx": {
     "description": "",
     "displayName": "DocsApp",
     "methods": [
@@ -14,10 +14,30 @@
           }
         ],
         "returns": null
+      },
+      {
+        "name": "buildComponentMenu",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "component",
+            "type": null
+          },
+          {
+            "name": "pathKeys",
+            "type": null
+          },
+          {
+            "name": "routes",
+            "type": null
+          }
+        ],
+        "returns": null
       }
     ]
   },
-  "src\\components\\Header\\ProjectHeader.jsx": {
+  "src/components/Header/ProjectHeader.jsx": {
     "description": "",
     "displayName": "ProjectHeader",
     "methods": [],
@@ -38,12 +58,12 @@
       }
     }
   },
-  "src\\components\\Logo\\Logo.jsx": {
+  "src/components/Logo/Logo.jsx": {
     "description": "",
     "displayName": "Logo",
     "methods": []
   },
-  "src\\components\\Sidebar\\Sidebar.js": {
+  "src/components/Sidebar/Sidebar.js": {
     "description": "",
     "displayName": "Sidebar",
     "methods": [
@@ -94,7 +114,12 @@
         "name": "renderItems",
         "docblock": null,
         "modifiers": [],
-        "params": [],
+        "params": [
+          {
+            "name": "menuItem",
+            "type": null
+          }
+        ],
         "returns": null
       },
       {
@@ -113,13 +138,13 @@
         "required": false,
         "description": "",
         "defaultValue": {
-          "value": "{\r\n    title: '',\r\n    entries: [],\r\n}",
+          "value": "{\n    title: '',\n    entries: [],\n}",
           "computed": false
         }
       },
       "componentMenu": {
         "type": {
-          "name": "object"
+          "name": "array"
         },
         "required": false,
         "description": "",
@@ -130,7 +155,7 @@
       }
     }
   },
-  "src\\components\\pages\\Page.jsx": {
+  "src/components/pages/Page.jsx": {
     "description": "",
     "displayName": "Page",
     "methods": [],
@@ -144,7 +169,21 @@
       }
     }
   },
-  "src\\components\\pages\\PageRouter.jsx": {
+  "src/components/pages/PageComponent.jsx": {
+    "description": "",
+    "displayName": "PageComponent",
+    "methods": [],
+    "props": {
+      "info": {
+        "type": {
+          "name": "object"
+        },
+        "required": true,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/PageRouter.jsx": {
     "description": "",
     "displayName": "PageRouter",
     "methods": [],
@@ -156,7 +195,7 @@
         "required": false,
         "description": "",
         "defaultValue": {
-          "value": "{\r\n    container: undefined,\r\n    main: undefined,\r\n}",
+          "value": "{\n    container: undefined,\n    main: undefined,\n}",
           "computed": false
         }
       },
@@ -167,7 +206,7 @@
         "required": false,
         "description": "",
         "defaultValue": {
-          "value": "{\r\n    style: undefined,\r\n    main: {},\r\n    content: {},\r\n}",
+          "value": "{\n    style: undefined,\n    main: {},\n    content: {},\n}",
           "computed": false
         }
       }
