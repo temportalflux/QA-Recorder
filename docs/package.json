@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "http://temportalflux.github.io/QA-Recorder",
   "scripts": {
-    "buildDocs": "react-docgen ../src/components/ --pretty --out ./src/reportMain.json && react-docgen ./src/components/ --pretty --out ./src/reportDocs.json",
+    "buildDocs": "node $(npm bin)/react-docgen ../src/components/ --pretty --out ./src/reportMain.json && react-docgen ./src/components/ --pretty --out ./src/reportDocs.json",
     "build": "react-scripts build",
     "start": "react-scripts start",
     "predeploy": "npm run build",
