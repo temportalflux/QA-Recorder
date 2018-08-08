@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Checkbox, Grid, Header, List} from "semantic-ui-react";
+import {Grid, Header, List} from "semantic-ui-react";
 import * as lodash from 'lodash';
-import { Link } from 'react-static';
+import {Link} from 'react-static';
 
 const linkListStyle = {
     background: '#f7f7f7',
@@ -15,10 +15,6 @@ const linkListStyle = {
 };
 
 export default class PageComponent extends React.Component {
-
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         let { info } = this.props;

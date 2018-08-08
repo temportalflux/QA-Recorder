@@ -5,13 +5,9 @@ import {ProjectHeader} from "../Header/ProjectHeader";
 
 export class Page extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
-            <Container id='introduction-page'>
+            <Container>
                 <ProjectHeader title={this.props.projectInfo.title} subtitle={this.props.projectInfo.subtitle} />
                 TODO: Fill with content
             </Container>
