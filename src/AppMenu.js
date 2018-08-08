@@ -1,13 +1,14 @@
 import * as electron from 'electron';
+import {GetEvents} from "./singletons/EventSystem";
 
-export function initMenu(events) {
+export function initMenu() {
     electron.remote.Menu.setApplicationMenu(electron.remote.Menu.buildFromTemplate([
         {
             label: 'File',
             submenu: [
                 {
                     label: 'Settings',
-                    click: () => { events.dispatch("open|settings"); },
+                    click: () => GetEvents().dispatch("open|settings"),
                 },
                 {type: 'separator'},
                 {role: 'minimize'},
@@ -33,11 +34,11 @@ export function initMenu(events) {
                 {type: 'separator'},
                 {
                     label: 'Open Launcher',
-                    click: () => { events.dispatch("open|launcher"); },
+                    click: () => GetEvents().dispatch("open|module", "launcher"),
                 },
                 {
                     label: 'Open Viewer',
-                    click: () => { events.dispatch("open|viewer"); },
+                    click: () => GetEvents().dispatch("open|module", "viewer"),
                 },
             ]
         },

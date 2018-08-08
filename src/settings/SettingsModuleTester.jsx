@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {Form} from "semantic-ui-react";
 import InputSaved from "../components/InputSaved";
 import NumericInputSaved from "../components/NumericInputSaved";
-import {SettingsModule} from "./SettingsModule";
 
 export const SettingsModuleTester = (props) => {
     return (

@@ -1,18 +1,12 @@
 import React from 'react';
-import {Button, Form, Header, Modal, Tab} from "semantic-ui-react";
+import {Button, Header, Modal} from "semantic-ui-react";
 import FileSystem from "../singletons/FileSystem";
 import * as lodash from "lodash";
-import {SettingsModuleTester} from "./SettingsModuleTester";
-import {SettingsModuleObs} from "./SettingsModuleObs";
-import {SettingsModuleRecording} from "./SettingsModuleRecording";
-import {SettingsModuleStreaming} from "./SettingsModuleStreaming";
-import {SettingsModuleApplication} from "./SettingsModuleApplication";
 import {GetLocalData} from "../singletons/LocalData";
 import {GetEvents} from "../singletons/EventSystem";
-import {LAUNCHER_STATUS} from "../windows/PanelLauncher";
+import {LAUNCHER_STATUS} from "../windows/AppModuleLauncher";
 import path from 'path';
-import {FaDownload, FaFile, FaSave, FaSync, FaTimes, FaUpload} from "react-icons/fa/index";
-import * as shortid from "shortid";
+import {FaDownload, FaSave, FaSync, FaUpload} from "react-icons/fa/index";
 import {SettingsDisplay} from "./SettingsDisplay";
 import {SettingsBtnChangeSensitive} from "./SettingsBtnChangeSensitive";
 

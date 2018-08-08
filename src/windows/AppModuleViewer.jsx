@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default class PanelViewer extends React.Component {
+export class AppModuleViewer extends React.Component {
 
     constructor(props) {
         super(props);
@@ -15,6 +15,6 @@ export default class PanelViewer extends React.Component {
 
 }
 
-PanelViewer.defaultProps = {};
+AppModuleViewer.defaultProps = {};
 
-PanelViewer.propTypes = {};
+AppModuleViewer.propTypes = {};

@@ -22,7 +22,7 @@ export const LAUNCHER_STATUS = Object.freeze(Object.keys({
     SESSION_COMPLETE: 0,
 }).reduce((states, key, i) => { states[key] = key; return states; }, {}));
 
-export default class PanelLauncher extends React.Component {
+export class AppModuleLauncher extends React.Component {
 
     static setStatus(status) {
         GetLocalData().set('launcher.state', status);
@@ -41,7 +41,7 @@ export default class PanelLauncher extends React.Component {
         this.obs = null;
         this.target = null;
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
     }
 
     componentDidMount() {
@@ -61,43 +61,43 @@ export default class PanelLauncher extends React.Component {
         });
 
         // GOTTA IMPORT THOSE ASSETS
-        PanelLauncher.setStatus(LAUNCHER_STATUS.LOADING_OBS_SETTINGS_FILES);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.LOADING_OBS_SETTINGS_FILES);
         await this.obs.addFileSettings();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.LAUNCHING_OBS);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.LAUNCHING_OBS);
         await this.obs.start();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.LOADING_OBS_SETTINGS);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.LOADING_OBS_SETTINGS);
         await this.obs.loadFromSettings();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.LAUNCHING_TARGET);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.LAUNCHING_TARGET);
         await this.target.spawn();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.START_RECORDING);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.START_RECORDING);
         await this.obs.startRecording();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.START_STREAMING);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.START_STREAMING);
         await this.obs.startStreaming();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.AWAITING_GAME_CLOSE);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.AWAITING_GAME_CLOSE);
     }
 
     async onTargetClose() {
         this.target = null;
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.STOP_RECORDING);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.STOP_RECORDING);
         await this.obs.stopRecording();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.STOP_STREAMING);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.STOP_STREAMING);
         await this.obs.stopStreaming();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.CLOSING_OBS);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.CLOSING_OBS);
         this.obs.stop();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.REMOVE_OBS_SETTINGS_FILES);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.REMOVE_OBS_SETTINGS_FILES);
         await this.obs.removeFileSettings();
 
-        PanelLauncher.setStatus(LAUNCHER_STATUS.SESSION_COMPLETE);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.SESSION_COMPLETE);
     }
 
     onStateChanged(state) {
@@ -106,7 +106,7 @@ export default class PanelLauncher extends React.Component {
 
     async reset() {
         GetLocalData().update("settings.tester.number", 0, (value) => value + 1);
-        PanelLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
+        AppModuleLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
     }
 
     render() {
@@ -260,6 +260,6 @@ export default class PanelLauncher extends React.Component {
 
 }
 
-PanelLauncher.defaultProps = {};
+AppModuleLauncher.defaultProps = {};
 
-PanelLauncher.propTypes = {};
+AppModuleLauncher.propTypes = {};
