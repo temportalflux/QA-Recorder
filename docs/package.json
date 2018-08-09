@@ -8,7 +8,7 @@
     "build": "react-scripts build",
     "start": "react-scripts start",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages-with-token -d build"
   },
   "dependencies": {
     "keyboard-key": "^1.0.2",
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "gh-pages": "^1.2.0",
+    "gh-pages-with-token": "^1.0.0",
     "install": "^0.12.1",
     "react-docgen": "^2.21.0"
   }
