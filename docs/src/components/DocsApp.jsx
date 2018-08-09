@@ -1,35 +1,55 @@
 import React from 'react';
-import style from '../Style'
 import {Page} from "./pages/Page";
-import {PageRouter} from "./pages/PageRouter";
-import {Icon} from "semantic-ui-react";
-import {ProjectHeader} from "./Header/ProjectHeader";
+import {Container, Dimmer, Header, Icon, Loader} from "semantic-ui-react";
 import * as lodash from 'lodash';
 import reportMain from '../reportMain.json';
 import reportDocs from '../reportDocs.json';
 import path from 'path';
-import PageComponent from "./pages/PageComponent";
+import {Router} from "./Router";
 
+/**
+ * TODO: Document
+ */
 export default class DocsApp extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.parseReport = this.parseReport.bind(this);
+        this.buildComponentMenu = this.buildComponentMenu.bind(this);
 
         this.state = {
-            docs: undefined,
-            componentRoutes: {},
+            hasLoaded: false,
+            project: {
+                projectInfo: {
+                    title: 'Unknown',
+                    subtitle: '',
+                    version: '0.0.0',
+                },
+                menu: {
+                    title: '',
+                    entries: [],
+                },
+                componentMenu: [],
+            },
+            routeData: {
+                main: {
+                    render: () => <div/>,
+                },
+                error: {
+                    render: () => <div/>,
+                },
+                menu: [],
+                components: [],
+            },
         };
-        this.state.docs = [
-            this.buildComponentMenu(this.parseReport(reportDocs), ["components", "Main"], this.state.componentRoutes),
-            this.buildComponentMenu(this.parseReport(reportMain), ["components", "Docs"], this.state.componentRoutes),
-        ];
-
-        console.log(this.state);
 
     }
 
+    /**
+     * TODO: Document
+     * @param obj
+     */
     parseReport(obj) {
         let componentCategories = {};
         lodash.forIn(obj, (compInfo, componentFullPath) => {
@@ -40,13 +60,22 @@ export default class DocsApp extends React.Component {
         return componentCategories;
     }
 
+    /**
+     * TODO: Document
+     * @param component
+     * @param pathKeys
+     * @param routes
+     * @returns {*}
+     */
     buildComponentMenu(component, pathKeys, routes) {
         if (component.hasOwnProperty('displayName')) {
-            routes[`/${pathKeys.join('/')}`] = () => {
-                return <PageComponent info={component}/>;
-            };
+            let routePath = `/${pathKeys.join('/')}`;
+            routes.push({
+                path: routePath,
+                render: () => <Page.Component info={component}/>,
+            });
             return {
-                route: `/${pathKeys.join('/')}`,
+                route: routePath,
                 displayName: component.displayName,
             };
         }
@@ -61,73 +90,84 @@ export default class DocsApp extends React.Component {
         }
     }
 
-    render() {
-        let sidebar = true;
-        const mainStyle = sidebar ? style.sidebarMain : style.main;
-        let projectInfo = {
-            title: 'QA Recorder',
-            subtitle: 'The is the package short description',
-            version: '1.0.1',
-        };
-        let routes = [
-            {
-                route: '/',
-                title: 'Introduction',
-            },
-        ].map((routeObj) => {
-            return lodash.defaultsDeep(routeObj, {
-                type: 'route',
-                render: () => {
-                    return (
-                        <Page projectInfo={projectInfo} />
-                    );
+    componentDidMount() {
+        let updates = {
+            hasLoaded: true,
+            project: {
+                projectInfo: {
+                    title: 'QA Recorder',
+                    subtitle: 'The is the package short description',
+                    version: '1.0.1',
                 },
-            });
-        });
-        let otherMenuItems = [
-            {
-                type: 'link',
-                url: '',
-                content: <label><Icon name='github' /> GitHub</label>
+                menu: {
+                    title: 'Getting Started',
+                    entries: [
+                        {
+                            type: 'route',
+                            route: '/',
+                            title: 'Introduction',
+                        },
+                        {
+                            type: 'link',
+                            url: '',
+                            content: <label><Icon name='github' /> GitHub</label>
+                        },
+                        {
+                            type: 'link',
+                            url: '',
+                            content: <label><Icon name='file outline' /> CHANGELOG</label>
+                        },
+                    ],
+                },
+                componentMenu: [],
             },
-            {
-                type: 'link',
-                url: '',
-                content: <label><Icon name='file outline' /> CHANGELOG</label>
+            routeData: {
+                main: {
+                    render: () => {
+                        let projectInfo = this.state.project.projectInfo;
+                        return (
+                            <Page projectInfo={projectInfo} title={'Introduction'}/>
+                        );
+                    },
+                },
+                error: {
+                    render: () => <Container>Error: 404. Not Found.</Container>,
+                },
+                menu: [
+                ],
+                components: [],
             },
-        ];
-        let menu = {
-            title: 'Getting Started',
-            entries: [
-                ...routes,
-                ...otherMenuItems,
-            ],
         };
-        return (
-            <PageRouter
-                style={{
-                    container: style.container,
-                    main: mainStyle,
-                }}
-                sidebar={{
-                    style: style.menu,
-                    header: (
-                        <ProjectHeader title={projectInfo.title} subtitle={`v${projectInfo.version}`} inline />
-                    ),
-                    menu: menu,
-                    componentMenu: this.state.docs,
-                }}
-                routes={
-                    lodash.merge(
-                        routes.reduce((obj, route) => {
-                            obj[route.route] = route.render;
-                            return obj;
-                        }, {}),
-                        this.state.componentRoutes
-                    )
-                }
-            />
-        );
+
+        updates.project.componentMenu = [
+            this.buildComponentMenu(this.parseReport(reportDocs), ["components", "Docs"], updates.routeData.components),
+            this.buildComponentMenu(this.parseReport(reportMain), ["components", "Main"], updates.routeData.components),
+        ];
+
+        this.setState(updates);
+    }
+
+    render() {
+        if (this.state.hasLoaded) {
+            return (
+                <Router
+                    project={this.state.project}
+                    routeMain={this.state.routeData.main}
+                    routeError={this.state.routeData.error}
+                    routes={lodash.flatten(lodash.values(lodash.pick(this.state.routeData, ['menu', 'components'])))}
+                />
+            );
+        }
+        else {
+            return (
+                <Dimmer active inverted>
+                    <Loader inverted>
+                        Loading Documentation
+                        <Header.Subheader>Please be patient</Header.Subheader>
+                    </Loader>
+                </Dimmer>
+            );
+        }
     }
 
 }

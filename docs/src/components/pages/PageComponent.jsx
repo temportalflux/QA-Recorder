@@ -1,20 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Grid, Header, List} from "semantic-ui-react";
-import * as lodash from 'lodash';
-import {Link} from 'react-static';
+import {Grid} from "semantic-ui-react";
+import {PageComponentPropsList} from "./PageComponentPropsList";
+import {PageComponentHeader} from "./PageComponentHeader";
 
-const linkListStyle = {
-    background: '#f7f7f7',
-    boxShadow: '0 0 1em 0.5em #f7f7f7',
-    margin: '0.5em',
-    padding: '0.5em',
-    position: 'absolute',
-    right: '0',
-    top: '0',
-};
+export class PageComponent extends React.Component {
 
-export default class PageComponent extends React.Component {
+    static Header = PageComponentHeader;
+    static PropsList = PageComponentPropsList;
 
     render() {
         let { info } = this.props;
@@ -27,33 +20,16 @@ export default class PageComponent extends React.Component {
             <Grid padded>
                 <Grid.Row>
                     <Grid.Column>
-                        <Header
-                            as='h1'
-                            content={displayName}
-                            subheader={lodash.join(description, ' ')}
+                        <PageComponentHeader
+                            displayName={displayName}
+                            description={description}
+                            seeTags={seeTags}
+                            repoURL={repoURL}
+                            repoPath={repoPath}
                         />
-                        <List horizontal link size='small' style={{ display: 'block' }}>
-                            {/* Heads up! Still render empty lists to reserve the whitespace */}
-                            <List.Item>
-                                <Header color='grey' content={seeTags.length > 0 ? 'See:' : ' '} size='tiny' />
-                            </List.Item>
-                            {lodash.map(seeTags, ({ displayName, to }) => (
-                                <List.Item as={Link} content={displayName} key={displayName} to={to} />
-                            ))}
-                        </List>
-                        <List link style={linkListStyle}>
-                            <List.Item
-                                content={
-                                    <code>
-                                        <a href={`${repoURL}/blob/master/${repoPath}`} target='_blank' rel='noopener noreferrer'>
-                                            {repoPath}
-                                        </a>
-                                    </code>
-                                }
-                                icon='github'
-                            />
-                        </List>
-                        {/* https://github.com/Semantic-Org/Semantic-UI-React/blob/e786724c73a6446fc5e86828ba446c18d4a9baab/docs/src/components/ComponentDoc/ComponentProps/ComponentProps.js */}
+                        <PageComponentPropsList
+                            properties={info.props}
+                        />
                     </Grid.Column>
                 </Grid.Row>
 

@@ -5,6 +5,7 @@ import {Icon, Input, Menu, Ref} from 'semantic-ui-react'
 import * as shortid from "shortid";
 import {Link} from "react-static";
 import * as lodash from 'lodash';
+import {ProjectHeader} from "../Header/ProjectHeader";
 
 export default class Sidebar extends React.Component {
 
@@ -84,7 +85,7 @@ export default class Sidebar extends React.Component {
                     style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
                 >
                     <Menu.Item>
-                        {this.props.header}
+                        <ProjectHeader title={this.props.projectInfo.title} subtitle={`v${this.props.projectInfo.version}`} inline />
                     </Menu.Item>
                     <Menu.Item style={{ boxShadow: '0 0 1rem black' }}>
                         <Menu.Header>{this.props.menu.title}</Menu.Header>
