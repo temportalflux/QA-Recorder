@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Checkbox} from "semantic-ui-react";
+import {Page} from "../../Page";
+import PageComponentPropsTable from "./Table/PageComponentPropsTable";
 
 // Based on https://github.com/Semantic-Org/Semantic-UI-React/blob/e786724c73a6446fc5e86828ba446c18d4a9baab/docs/src/components/ComponentDoc/ComponentProps/ComponentProps.js
 export class PageComponentPropsList extends React.Component {
@@ -27,6 +29,7 @@ export class PageComponentPropsList extends React.Component {
         return (
             <div>
                 <Checkbox slider checked={this.state.isActive} label='Props' onClick={this.handleToggle} />
+                { this.state.isActive && <PageComponentPropsTable props={this.props.properties} />}
             </div>
         );
     }

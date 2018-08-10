@@ -1,13 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Grid} from "semantic-ui-react";
-import {PageComponentPropsList} from "./PageComponentPropsList";
+import {PageComponentPropsList} from "./Props/PageComponentPropsList";
 import {PageComponentHeader} from "./PageComponentHeader";
 
 export class PageComponent extends React.Component {
-
-    static Header = PageComponentHeader;
-    static PropsList = PageComponentPropsList;
 
     render() {
         let { info } = this.props;

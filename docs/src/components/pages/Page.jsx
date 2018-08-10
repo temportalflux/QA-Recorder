@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Container, Header} from "semantic-ui-react";
 import {ProjectHeader} from "../Header/ProjectHeader";
-import {PageComponent} from "./PageComponent";
+import {PageComponent} from "./Component/PageComponent";
 
 export class Page extends React.Component {
 
