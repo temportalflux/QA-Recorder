@@ -126,7 +126,7 @@ export default class DocsApp extends React.Component {
                     render: () => {
                         let projectInfo = this.state.project.projectInfo;
                         return (
-                            <Page projectInfo={projectInfo} title={'Introduction'}/>
+                            <Page projectInfo={projectInfo} markdown={'# Introduction'}/>
                         );
                     },
                 },
