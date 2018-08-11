@@ -31,21 +31,21 @@ export const FILENAME_FORMATS = {
     ],
     custom: [
         {
-            key: 'name', path: 'settings.application.name', defaultValue: '',
+            key: 'name', examplesPath: 'settings.application.name', defaultValue: '',
             description: 'Application name',
         },
         {
-            key: 'tester', path: 'settings.tester.name', defaultValue: '',
+            key: 'tester', examplesPath: 'settings.tester.name', defaultValue: '',
             description: 'Tester name',
         },
         {
-            key: 'test#', path: 'settings.tester.number', defaultValue: 0,
+            key: 'test#', examplesPath: 'settings.tester.number', defaultValue: 0,
             description: 'Tester number',
         },
         {
             key: 'appFile', description: 'Executable file name',
             defaultValue: 0,
-            path: 'settings.application.executable',
+            examplesPath: 'settings.application.executable',
             parseValue: (value) => {
                 value = FileSystem.resolvePlatformPath(value);
                 return path.basename(value, path.extname(value));
@@ -267,7 +267,7 @@ export class Settings extends React.Component {
         let filename = GetLocalData().get(`settings.record.filename`, '%Y-%m-%d_%H-%M-%S_%Z');
 
         filename = FILENAME_FORMATS.custom.reduce((filenameFormat, keyPath) => {
-            let value = GetLocalData().get(keyPath.path, keyPath.defaultValue);
+            let value = GetLocalData().get(keyPath.examplesPath, keyPath.defaultValue);
             if (keyPath.parseValue) {
                 value = keyPath.parseValue(value);
             }

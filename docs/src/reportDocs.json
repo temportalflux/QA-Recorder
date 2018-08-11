@@ -1,39 +1,50 @@
 {
   "src/components/DocsApp.jsx": {
-    "description": "",
+    "description": "TODO: Document",
     "displayName": "DocsApp",
     "methods": [
       {
         "name": "parseReport",
-        "docblock": null,
+        "docblock": "TODO: Document\n@param obj",
         "modifiers": [],
         "params": [
           {
             "name": "obj",
+            "description": null,
             "type": null
           }
         ],
-        "returns": null
+        "returns": null,
+        "description": "TODO: Document"
       },
       {
         "name": "buildComponentMenu",
-        "docblock": null,
+        "docblock": "TODO: Document\n@param component\n@param pathKeys\n@param routes\n@returns {*}",
         "modifiers": [],
         "params": [
           {
             "name": "component",
+            "description": null,
             "type": null
           },
           {
             "name": "pathKeys",
+            "description": null,
             "type": null
           },
           {
             "name": "routes",
+            "description": null,
             "type": null
           }
         ],
-        "returns": null
+        "returns": {
+          "description": null,
+          "type": {
+            "name": "mixed"
+          }
+        },
+        "description": "TODO: Document"
       }
     ]
   },
@@ -62,6 +73,41 @@
     "description": "",
     "displayName": "Logo",
     "methods": []
+  },
+  "src/components/Router.jsx": {
+    "description": "",
+    "displayName": "Router",
+    "methods": [],
+    "props": {
+      "project": {
+        "type": {
+          "name": "object"
+        },
+        "required": true,
+        "description": ""
+      },
+      "routeMain": {
+        "type": {
+          "name": "object"
+        },
+        "required": true,
+        "description": ""
+      },
+      "routeError": {
+        "type": {
+          "name": "object"
+        },
+        "required": true,
+        "description": ""
+      },
+      "routes": {
+        "type": {
+          "name": "array"
+        },
+        "required": true,
+        "description": ""
+      }
+    }
   },
   "src/components/Sidebar/Sidebar.js": {
     "description": "",
@@ -155,21 +201,7 @@
       }
     }
   },
-  "src/components/pages/Page.jsx": {
-    "description": "",
-    "displayName": "Page",
-    "methods": [],
-    "props": {
-      "projectInfo": {
-        "type": {
-          "name": "object"
-        },
-        "required": true,
-        "description": ""
-      }
-    }
-  },
-  "src/components/pages/PageComponent.jsx": {
+  "src/components/pages/Component/PageComponent.jsx": {
     "description": "",
     "displayName": "PageComponent",
     "methods": [],
@@ -183,32 +215,305 @@
       }
     }
   },
-  "src/components/pages/PageRouter.jsx": {
+  "src/components/pages/Component/PageComponentHeader.jsx": {
     "description": "",
-    "displayName": "PageRouter",
-    "methods": [],
+    "displayName": "PageComponentHeader",
+    "methods": []
+  },
+  "src/components/pages/Component/Props/PageComponentPropsList.jsx": {
+    "description": "",
+    "displayName": "PageComponentPropsList",
+    "methods": [
+      {
+        "name": "handleToggle",
+        "docblock": null,
+        "modifiers": [],
+        "params": [],
+        "returns": null
+      }
+    ],
     "props": {
-      "style": {
+      "properties": {
         "type": {
           "name": "object"
+        },
+        "required": true,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/Component/Props/Prop/ComponentPropExtra.jsx": {
+    "description": "",
+    "displayName": "ComponentPropExtra",
+    "methods": [],
+    "props": {
+      "children": {
+        "type": {
+          "name": "node"
+        },
+        "required": false,
+        "description": ""
+      },
+      "inline": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": ""
+      },
+      "title": {
+        "type": {
+          "name": "node"
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/Component/Props/Prop/PageComponentPropDefaultValue.jsx": {
+    "description": "",
+    "displayName": "PageComponentPropDefaultValue",
+    "methods": [],
+    "props": {
+      "value": {
+        "type": {
+          "name": "node"
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/Component/Props/Prop/PageComponentPropDescription.jsx": {
+    "description": "",
+    "displayName": "PageComponentPropDescription",
+    "methods": [],
+    "props": {
+      "description": {
+        "type": {
+          "name": "string"
+        },
+        "required": true,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/Component/Props/Prop/PageComponentPropEnum.jsx": {
+    "description": "",
+    "displayName": "ComponentPropEnum",
+    "methods": [],
+    "props": {
+      "limit": {
+        "type": {
+          "name": "number"
         },
         "required": false,
         "description": "",
         "defaultValue": {
-          "value": "{\n    container: undefined,\n    main: undefined,\n}",
+          "value": "50",
           "computed": false
         }
       },
-      "sidebar": {
+      "showAll": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": ""
+      },
+      "toggle": {
+        "type": {
+          "name": "func"
+        },
+        "required": false,
+        "description": ""
+      },
+      "type": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": ""
+      },
+      "values": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/Component/Props/Prop/PageComponentPropFunctionSingature.jsx": {
+    "description": "",
+    "displayName": "PageComponentPropFunctionSignature",
+    "methods": [],
+    "props": {
+      "name": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": ""
+      },
+      "tags": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/Component/Props/Prop/PageComponentPropName.jsx": {
+    "description": "",
+    "displayName": "PageComponentPropName",
+    "methods": [],
+    "props": {
+      "name": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": ""
+      },
+      "required": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/Component/Props/Table/PageComponentPropsTable.jsx": {
+    "description": "Displays a table of a Component's PropTypes.",
+    "displayName": "ComponentTable",
+    "methods": [],
+    "props": {
+      "props": {
         "type": {
           "name": "object"
+        },
+        "required": true,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/Component/Props/Table/PageComponentTableHeader.jsx": {
+    "description": "",
+    "displayName": "PageComponentTableHeader",
+    "methods": []
+  },
+  "src/components/pages/Component/Props/Table/PageComponentTableRow.jsx": {
+    "description": "",
+    "displayName": "PageComponentTableRow",
+    "methods": [
+      {
+        "name": "toggleEnums",
+        "docblock": null,
+        "modifiers": [],
+        "params": [],
+        "returns": null
+      }
+    ],
+    "props": {
+      "defaultValue": {
+        "type": {
+          "name": "shape",
+          "value": {
+            "value": {
+              "name": "string",
+              "required": false
+            }
+          }
         },
         "required": false,
         "description": "",
         "defaultValue": {
-          "value": "{\n    style: undefined,\n    main: {},\n    content: {},\n}",
+          "value": "{ value: null }",
           "computed": false
         }
+      },
+      "description": {
+        "type": {
+          "name": "string"
+        },
+        "required": true,
+        "description": ""
+      },
+      "name": {
+        "type": {
+          "name": "string"
+        },
+        "required": true,
+        "description": ""
+      },
+      "required": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": ""
+      },
+      "tags": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": ""
+      },
+      "type": {
+        "type": {
+          "name": "shape",
+          "value": {
+            "name": {
+              "name": "string",
+              "required": true
+            }
+          }
+        },
+        "required": true,
+        "description": ""
+      },
+      "value": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "string"
+            },
+            {
+              "name": "arrayOf",
+              "value": {
+                "name": "string"
+              }
+            }
+          ]
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/components/pages/Page.jsx": {
+    "description": "",
+    "displayName": "Page",
+    "methods": [],
+    "props": {
+      "projectInfo": {
+        "type": {
+          "name": "object"
+        },
+        "required": true,
+        "description": "The project information to display using ProjectHeader."
+      },
+      "markdown": {
+        "type": {
+          "name": "string"
+        },
+        "required": true,
+        "description": "https://rexxars.github.io/react-markdown/"
       }
     }
   }

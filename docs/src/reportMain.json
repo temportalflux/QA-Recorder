@@ -89,7 +89,7 @@
           "name": "object"
         },
         "required": false,
-        "description": "",
+        "description": "Options for the browse dialog",
         "defaultValue": {
           "value": "{}",
           "computed": false
@@ -100,18 +100,18 @@
           "name": "array"
         },
         "required": false,
-        "description": "",
+        "description": "File filters",
         "defaultValue": {
           "value": "[]",
           "computed": false
         }
       },
-      "path": {
+      "examplesPath": {
         "type": {
           "name": "string"
         },
         "required": true,
-        "description": ""
+        "description": "The initial path"
       }
     }
   },
@@ -211,7 +211,7 @@
       }
     ],
     "props": {
-      "path": {
+      "examplesPath": {
         "type": {
           "name": "string"
         },
@@ -242,7 +242,7 @@
       }
     ],
     "props": {
-      "path": {
+      "examplesPath": {
         "type": {
           "name": "string"
         },
@@ -280,7 +280,7 @@
       }
     ],
     "props": {
-      "path": {
+      "examplesPath": {
         "type": {
           "name": "string"
         },
@@ -329,7 +329,7 @@
       }
     ],
     "props": {
-      "path": {
+      "examplesPath": {
         "type": {
           "name": "string"
         },
@@ -426,7 +426,7 @@
       }
     ],
     "props": {
-      "path": {
+      "examplesPath": {
         "type": {
           "name": "string"
         },

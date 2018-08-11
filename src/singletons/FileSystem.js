@@ -44,7 +44,7 @@ export default class FileSystem {
     }
 
     static resolvePotentialRelative(pathObject) {
-        return pathObject.isRelative ? path.resolve(FileSystem.cwd(), pathObject.path) : pathObject.path;
+        return pathObject.isRelative ? path.resolve(FileSystem.cwd(), pathObject.examplesPath) : pathObject.examplesPath;
     }
 
     static exists(filePath) {

@@ -26,7 +26,7 @@ export class SettingsDisplay extends React.Component {
                     render: () => (
                         <SettingsModule>
                             {React.createElement(tab.component, {
-                                path: `settings.${tab.path}`,
+                                examplesPath: `settings.${tab.examplesPath}`,
                                 shouldBeDisabled: () => {
                                     return this.props.launcherIsRunning;
                                 },

@@ -92,8 +92,17 @@ BrowseBar.defaultProps = {
 };
 
 BrowseBar.propTypes = {
+    /**
+     * Options for the browse dialog
+     */
     options: PropTypes.object,
+    /**
+     * File filters
+     */
     filters: PropTypes.array,
 
+    /**
+     * The initial path
+     */
     path: PropTypes.string.isRequired,
 };

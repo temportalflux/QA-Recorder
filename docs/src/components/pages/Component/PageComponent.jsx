@@ -1,8 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Grid} from "semantic-ui-react";
+import {Grid, Icon} from "semantic-ui-react";
 import {PageComponentPropsList} from "./Props/PageComponentPropsList";
 import {PageComponentHeader} from "./PageComponentHeader";
+import {ComponentExamples} from "./Examples/ComponentExamples";
+
+const exampleEndStyle = {
+    textAlign: 'center',
+    opacity: 0.5,
+    paddingTop: '50vh',
+};
 
 export class PageComponent extends React.Component {
 
@@ -25,35 +32,24 @@ export class PageComponent extends React.Component {
                             repoPath={repoPath}
                         />
                         <PageComponentPropsList
-                            properties={info.props}
+                            properties={info.props || {}}
                         />
                     </Grid.Column>
                 </Grid.Row>
-
-                {/*
                 <Grid.Row columns='equal'>
                     <Grid.Column>
-                        <div ref={this.handleExamplesRef}>
+                        <div>
                             <ComponentExamples
-                                displayName={displayName}
-                                examplesExist={componentInfo.examplesExist}
-                                type={componentInfo.type}
+                                examplesPath={`src/examples/test`}
+                                displayName={'test'}//info.displayName}
+                                examplesExist={true}
                             />
                         </div>
                         <div style={exampleEndStyle}>
                             This is the bottom <Icon name='pointing down' />
                         </div>
                     </Grid.Column>
-                    <Grid.Column computer={5} largeScreen={4} widescreen={4}>
-                        <ComponentSidebar
-                            activePath={activePath}
-                            examplesRef={examplesRef}
-                            onItemClick={this.handleSidebarItemClick}
-                            sections={sidebarSections}
-                        />
-                    </Grid.Column>
                 </Grid.Row>
-                */}
             </Grid>
         );
     }

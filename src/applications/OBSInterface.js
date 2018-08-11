@@ -202,7 +202,7 @@ export default class OBSInterface {
     async loadFromSettingsRecord() {
         let rootKey = 'settings.record';
         //let enabled = GetLocalData().get(`${rootKey}.enabled`);
-        let outputDir = FileSystem.resolvePotentialRelative(GetLocalData().get(`${rootKey}.outputDirectory`, {path: FileSystem.appData()}));
+        let outputDir = FileSystem.resolvePotentialRelative(GetLocalData().get(`${rootKey}.outputDirectory`, {examplesPath: FileSystem.appData()}));
         await this.request('SetRecordingFolder', { 'rec-folder': outputDir });
         await this.request('SetFilenameFormatting', { 'filename-formatting': Settings.getFilenameFormatting() });
     }
