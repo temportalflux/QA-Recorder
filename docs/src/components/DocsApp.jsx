@@ -71,7 +71,7 @@ export default class DocsApp extends React.Component {
         if (component.hasOwnProperty('displayName')) {
             let routePath = `/${pathKeys.join('/')}`;
             routes.push({
-                examplesPath: routePath,
+                path: routePath,
                 render: () => <Page.Component info={component}/>,
             });
             return {

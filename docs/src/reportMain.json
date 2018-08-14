@@ -106,7 +106,7 @@
           "computed": false
         }
       },
-      "examplesPath": {
+      "path": {
         "type": {
           "name": "string"
         },
@@ -211,7 +211,7 @@
       }
     ],
     "props": {
-      "examplesPath": {
+      "path": {
         "type": {
           "name": "string"
         },
@@ -242,7 +242,7 @@
       }
     ],
     "props": {
-      "examplesPath": {
+      "path": {
         "type": {
           "name": "string"
         },
@@ -280,7 +280,7 @@
       }
     ],
     "props": {
-      "examplesPath": {
+      "path": {
         "type": {
           "name": "string"
         },
@@ -329,7 +329,7 @@
       }
     ],
     "props": {
-      "examplesPath": {
+      "path": {
         "type": {
           "name": "string"
         },
@@ -426,7 +426,7 @@
       }
     ],
     "props": {
-      "examplesPath": {
+      "path": {
         "type": {
           "name": "string"
         },
