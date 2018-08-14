@@ -4,48 +4,62 @@ import FileSystem from "../singletons/FileSystem";
 import * as lodash from "lodash";
 import {GetLocalData} from "../singletons/LocalData";
 import {GetEvents} from "../singletons/EventSystem";
-import {LAUNCHER_STATUS} from "../windows/AppModuleLauncher";
+import {LAUNCHER_STATUS} from "../modules/launcher/AppModuleLauncher";
 import path from 'path';
 import {FaDownload, FaSave, FaSync, FaUpload} from "react-icons/fa/index";
 import {SettingsDisplay} from "./SettingsDisplay";
 import {SettingsBtnChangeSensitive} from "./SettingsBtnChangeSensitive";
+import moment from 'moment';
+
+function makeFilenameFormat(momentFormat, description) {
+    return {
+        key: momentFormat, description: description,
+        getValue: () => moment().format(momentFormat),
+    };
+}
 
 export const FILENAME_FORMATS = {
     obs: [
-        { key: '%Y or %CCYY', description: 'Year, 4-digit' },
-        { key: '%y or %YY', description: 'Year, last 2-digits' },
-        { key: '%m or %MM', description: 'Month (1-12)' },
-        { key: '%b', description: 'Short month name (JAN-DEC)' },
-        { key: '%B', description: 'Long month name (January-December)' },
-        { key: '%d or %DD', description: 'Day (01-31)' },
-        { key: '%a', description: 'Short day name (SUN-SAT)' },
-        { key: '%A', description: 'Long day name (Sunday-Saturday)' },
-        { key: '%I', description: 'Hour (1-12)' },
-        { key: '%H or %hh', description: 'Hour (00-23)' },
-        { key: '%M or %mm', description: 'Minute (00-59)' },
-        { key: '%S or %ss', description: 'Second (00-59)' },
-        { key: '%p', description: 'AM or PM' },
-        { key: '%z', description: 'ISO 8601 offset from UTC' },
-        { key: '%Z', description: 'Timezone' },
-        { key: '%%', description: 'The % sign' },
+        makeFilenameFormat('YYYY', 'Year, 4-digit'),
+        makeFilenameFormat('YY', 'Year, last 2-digits'),
+        makeFilenameFormat('M', 'Month (1-12)'),
+        makeFilenameFormat('MM', 'Month (01-12)'),
+        makeFilenameFormat('MMM', 'Short month name (Jan-Dec)'),
+        makeFilenameFormat('MMMM', 'Long month name (January-December)'),
+        makeFilenameFormat('D', 'Date (1-31)'),
+        makeFilenameFormat('DD', 'Date (01-31)'),
+        makeFilenameFormat('ddd', 'Short day name (SUN-SAT)'),
+        makeFilenameFormat('dddd', 'Long day name (Sunday-Saturday)'),
+        makeFilenameFormat('h', 'Hour (1-12)'),
+        makeFilenameFormat('hh', 'Hour (01-12)'),
+        makeFilenameFormat('H', 'Hour (0-23)'),
+        makeFilenameFormat('HH', 'Hour (00-23)'),
+        makeFilenameFormat('m', 'Minute (0-59)'),
+        makeFilenameFormat('mm', 'Minute (00-59)'),
+        makeFilenameFormat('s', 'Second (0-59)'),
+        makeFilenameFormat('ss', 'Second (00-59)'),
+        makeFilenameFormat('a', 'am/pm'),
+        makeFilenameFormat('A', 'AM/PM'),
+        makeFilenameFormat('Z', 'Timezone (-07:00 ... +07:00)'),
+        makeFilenameFormat('ZZ', 'Timezone (-0700 ... +0700)'),
     ],
     custom: [
         {
-            key: 'name', examplesPath: 'settings.application.name', defaultValue: '',
+            key: 'name', path: 'settings.application.name', defaultValue: '',
             description: 'Application name',
         },
         {
-            key: 'tester', examplesPath: 'settings.tester.name', defaultValue: '',
+            key: 'tester', path: 'settings.tester.name', defaultValue: '',
             description: 'Tester name',
         },
         {
-            key: 'test#', examplesPath: 'settings.tester.number', defaultValue: 0,
+            key: 'test#', path: 'settings.tester.number', defaultValue: 0,
             description: 'Tester number',
         },
         {
             key: 'appFile', description: 'Executable file name',
             defaultValue: 0,
-            examplesPath: 'settings.application.executable',
+            path: 'settings.application.executable',
             parseValue: (value) => {
                 value = FileSystem.resolvePlatformPath(value);
                 return path.basename(value, path.extname(value));
@@ -53,6 +67,10 @@ export const FILENAME_FORMATS = {
         },
     ],
 };
+
+FILENAME_FORMATS.obs.forEach((item) => {
+    console.log(item.key, item.getValue());
+});
 
 export class Settings extends React.Component {
 
@@ -62,6 +80,10 @@ export class Settings extends React.Component {
 
     static setSettings(settings) {
         return GetLocalData().set('settings', settings);
+    }
+
+    static getDataPath(settingsPath) {
+        return `settings.${settingsPath}`;
     }
 
     static async loadSettings() {
@@ -264,14 +286,19 @@ export class Settings extends React.Component {
     }
 
     static getFilenameFormatting() {
-        let filename = GetLocalData().get(`settings.record.filename`, '%Y-%m-%d_%H-%M-%S_%Z');
+        let filename = GetLocalData().get(`settings.record.filename`, '${YYYY}-${MM}-${DD}_${HH}-${mm}-${ss}_${ZZ}');
+
+        filename = FILENAME_FORMATS.obs.reduce((filenameFormat, format) => {
+            return filenameFormat.replace(new RegExp(`\\\${${format.key}}`, 'g'), format.getValue());
+        }, filename);
 
         filename = FILENAME_FORMATS.custom.reduce((filenameFormat, keyPath) => {
-            let value = GetLocalData().get(keyPath.examplesPath, keyPath.defaultValue);
+            // TODO: Do OBS settings too
+            let value = GetLocalData().get(keyPath.path, keyPath.defaultValue);
             if (keyPath.parseValue) {
                 value = keyPath.parseValue(value);
             }
-            return filenameFormat.replace(new RegExp(`%${keyPath.key}`, 'g'), value);
+            return filenameFormat.replace(new RegExp(`\\\${${keyPath.key}}`, 'g'), value);
         }, filename);
 
         return filename;

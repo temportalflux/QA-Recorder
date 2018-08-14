@@ -44,7 +44,7 @@ export default class FileSystem {
     }
 
     static resolvePotentialRelative(pathObject) {
-        return pathObject.isRelative ? path.resolve(FileSystem.cwd(), pathObject.examplesPath) : pathObject.examplesPath;
+        return pathObject.isRelative ? path.resolve(FileSystem.cwd(), pathObject.path) : pathObject.path;
     }
 
     static exists(filePath) {
@@ -70,6 +70,15 @@ export default class FileSystem {
 
     static async readFileRelative(filePath) {
         return await FileSystem.readFile(path.join(FileSystem.cwd(), filePath));
+    }
+
+    static readDir(filePath) {
+        return new Promise((resolve, reject) => {
+            fs.readdir(filePath, (err, data) => {
+                if (err) reject(err);
+                else resolve(data);
+            });
+        });
     }
 
     static writeFile(filePath, data) {
@@ -135,6 +144,15 @@ export default class FileSystem {
 
     static async remove(filePath) {
         await fsextra.remove(filePath);
+    }
+
+    static rename(src, destination) {
+        return new Promise((resolve, reject) => {
+            fs.rename(src, destination, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
     }
 
 }

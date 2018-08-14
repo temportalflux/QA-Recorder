@@ -38,7 +38,6 @@ export class LocalData {
     }
 
     get(path, defaultValue) {
-        if (!lodash.has(this.data, path)) return defaultValue;
         return lodash.get(this.data, path, defaultValue);
     }
 

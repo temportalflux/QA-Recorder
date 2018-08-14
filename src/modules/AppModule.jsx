@@ -1,6 +1,6 @@
 import React from "react";
-import {AppModuleLauncher} from "./AppModuleLauncher";
-import {AppModuleViewer} from "./AppModuleViewer";
+import {AppModuleLauncher} from "./launcher/AppModuleLauncher";
+import {AppModuleViewer} from "./viewer/AppModuleViewer";
 
 export const AppModules = {
     launcher: () => {

@@ -1,10 +1,10 @@
 import React from 'react';
 import {Button, Header, Segment} from "semantic-ui-react";
-import LocalDataDisplay from "../components/LocalDataDisplay";
-import OBSInterface from "../applications/OBSInterface";
-import {GetLocalData} from "../singletons/LocalData";
-import CreateApplicationController from "../applications/CreateApplicationController";
-import DynamicFrame from "../components/DynamicFrame";
+import LocalDataDisplay from "../../components/LocalDataDisplay";
+import OBSInterface from "../../applications/OBSInterface";
+import {GetLocalData} from "../../singletons/LocalData";
+import CreateApplicationController from "../../applications/CreateApplicationController";
+import DynamicFrame from "../../components/DynamicFrame";
 
 export const LAUNCHER_STATUS = Object.freeze(Object.keys({
     AWAITING_LAUNCH: 0,
@@ -95,7 +95,7 @@ export class AppModuleLauncher extends React.Component {
         this.obs.stop();
 
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.REMOVE_OBS_SETTINGS_FILES);
-        await this.obs.removeFileSettings();
+        await this.obs.cleanup();
 
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.SESSION_COMPLETE);
     }
@@ -110,8 +110,6 @@ export class AppModuleLauncher extends React.Component {
     }
 
     render() {
-        /*<Viewer />
-        */
         return (
             <div>
                 <Header size={'large'} textAlign='center'>

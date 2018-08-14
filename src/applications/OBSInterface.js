@@ -4,6 +4,7 @@ import path from "path";
 import FileSystem from "../singletons/FileSystem";
 import {GetLocalData} from "../singletons/LocalData";
 import {Settings} from "../settings/Settings";
+import * as lodash from 'lodash';
 
 export default class OBSInterface {
 
@@ -14,7 +15,8 @@ export default class OBSInterface {
         this.getSettingsPathScenes = this.getSettingsPathScenes.bind(this);
 
         this.addFileSettings = this.addFileSettings.bind(this);
-        this.removeFileSettings = this.removeFileSettings.bind(this);
+        this.cleanup = this.cleanup.bind(this);
+        this.moveOutputFile = this.moveOutputFile.bind(this);
 
         this.addFileSettingsProfile = this.addFileSettingsProfile.bind(this);
         this.removeFileSettingsProfile = this.removeFileSettingsProfile.bind(this);
@@ -36,6 +38,7 @@ export default class OBSInterface {
 
         this.request = this.request.bind(this);
         this.loadFromSettings = this.loadFromSettings.bind(this);
+        this.getRecordingOutputDirectory = this.getRecordingOutputDirectory.bind(this);
         this.loadFromSettingsRecord = this.loadFromSettingsRecord.bind(this);
         this.loadFromSettingsStream = this.loadFromSettingsStream.bind(this);
 
@@ -65,9 +68,10 @@ export default class OBSInterface {
         await this.addFileSettingsScenes();
     }
 
-    async removeFileSettings() {
+    async cleanup() {
         await this.removeFileSettingsProfile();
         await this.removeFileSettingsScenes();
+        await this.moveOutputFile();
     }
 
     async addFileSettingsProfile() {
@@ -199,12 +203,33 @@ export default class OBSInterface {
         await this.loadFromSettingsStream();
     }
 
-    async loadFromSettingsRecord() {
+    getRecordingOutputDirectory() {
         let rootKey = 'settings.record';
-        //let enabled = GetLocalData().get(`${rootKey}.enabled`);
-        let outputDir = FileSystem.resolvePotentialRelative(GetLocalData().get(`${rootKey}.outputDirectory`, {examplesPath: FileSystem.appData()}));
-        await this.request('SetRecordingFolder', { 'rec-folder': outputDir });
-        await this.request('SetFilenameFormatting', { 'filename-formatting': Settings.getFilenameFormatting() });
+        return path.join(
+            FileSystem.resolvePotentialRelative(
+                GetLocalData().get(`${rootKey}.outputDirectory`, {path: FileSystem.appData()})
+            ),
+            this.filenameFormatted
+        );
+    }
+
+    async loadFromSettingsRecord() {
+        this.filenameFormatted = Settings.getFilenameFormatting();
+        await this.request('SetRecordingFolder', { 'rec-folder': this.getRecordingOutputDirectory() });
+        await this.request('SetFilenameFormatting', { 'filename-formatting': 'footage' });
+    }
+
+    async moveOutputFile() {
+        let outputDir = this.getRecordingOutputDirectory();
+        let contents = await FileSystem.readDir(outputDir);
+        console.log(contents);
+        let footageFilePath = lodash.find(contents, (item) => path.basename(item, path.extname(item)) === 'footage');
+        console.log(footageFilePath);
+        await FileSystem.rename(
+            path.resolve(outputDir, footageFilePath),
+            path.resolve(outputDir, `${this.filenameFormatted}${path.extname(footageFilePath)}`)
+        );
+        delete this.filenameFormatted;
     }
 
     async loadFromSettingsStream() {

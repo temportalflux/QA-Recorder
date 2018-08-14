@@ -5,8 +5,11 @@ import {Header} from "semantic-ui-react";
 import FileSystem from "./singletons/FileSystem";
 import {GetEvents} from "./singletons/EventSystem";
 import {Loading} from "./components/Loading";
-import {AppModules} from "./windows/AppModule";
+import {AppModules} from "./modules/AppModule";
 
+/**
+ * Core component module
+ */
 export class App extends React.Component {
 
     constructor(props) {

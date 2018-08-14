@@ -1,6 +1,9 @@
-import * as electron from 'electron';
+import electron from 'electron';
 import {GetEvents} from "./singletons/EventSystem";
 
+/**
+ * Initializes the Electron window's menu bar.
+ */
 export function initMenu() {
     electron.remote.Menu.setApplicationMenu(electron.remote.Menu.buildFromTemplate([
         {
