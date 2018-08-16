@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import { Table } from 'semantic-ui-react'
-import {Page} from "../../../Page";
+import React, {Component} from 'react'
+import {Table} from 'semantic-ui-react'
 import {PageComponentPropName} from "../Prop/PageComponentPropName";
 import {PageComponentPropDefaultValue} from "../Prop/PageComponentPropDefaultValue";
 import {PageComponentPropDescription} from "../Prop/PageComponentPropDescription";
@@ -21,9 +20,9 @@ export class PageComponentTableRow extends Component {
     }
 
     render() {
-        const { defaultValue, description, name, required, tags, type, value } = this.props;
-        const { showEnums } = this.state;
-        console.log(this.props);
+        const { defaultValue, description, name, required, tags, type/*, value*/ } = this.props;
+        //const { showEnums } = this.state;
+        //console.log(this.props);
         return (
             <Table.Row key={name}>
                 <Table.Cell collapsing>
