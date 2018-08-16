@@ -6,6 +6,7 @@ import FileSystem from "./singletons/FileSystem";
 import {GetEvents} from "./singletons/EventSystem";
 import {Loading} from "./components/Loading";
 import {AppModules} from "./modules/AppModule";
+import {EVENT_LIST} from "./singletons/EventList";
 
 /**
  * Core component module
@@ -26,7 +27,7 @@ export class App extends React.Component {
     componentDidMount() {
         console.log("Loaded app with data path", FileSystem.cwd());
 
-        GetEvents().subscribe('open|module', 'app', (module) => {
+        GetEvents().subscribe(EVENT_LIST.REQUEST_OPEN_MODULE, 'app', (module) => {
             if (this.state.module !== module)
                 this.setState({module: module});
         });
@@ -37,7 +38,7 @@ export class App extends React.Component {
     }
 
     componentWillUnmount() {
-        GetEvents().unsubscribe('open|module', 'app');
+        GetEvents().unsubscribe(EVENT_LIST.REQUEST_OPEN_MODULE, 'app');
     }
 
     render() {

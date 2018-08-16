@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {GetEvents} from "../singletons/EventSystem";
 import * as shortid from "shortid";
 import {Tab} from "semantic-ui-react";
+import {EVENT_LIST} from "../singletons/EventList";
 
 export class SettingsModule extends React.Component {
 
@@ -18,11 +19,11 @@ export class SettingsModule extends React.Component {
 
     componentDidMount() {
         // TODO: This is not actually unique because componentDidMount doesn't unmount and mount its different panes, even with renderActiveOnly=true
-        GetEvents().subscribe('settings|import', 'settings|module', this.handleImport);
+        GetEvents().subscribe(EVENT_LIST.NOTIFY_SETTINGS_IMPORTED, 'settings|module', this.handleImport);
     }
 
     componentWillUnmount() {
-        GetEvents().unsubscribe('settings|import', 'settings|module');
+        GetEvents().unsubscribe(EVENT_LIST.NOTIFY_SETTINGS_IMPORTED, 'settings|module');
     }
 
     handleImport() {

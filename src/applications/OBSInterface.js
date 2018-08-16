@@ -5,6 +5,8 @@ import FileSystem from "../singletons/FileSystem";
 import {GetLocalData} from "../singletons/LocalData";
 import {Settings} from "../settings/Settings";
 import * as lodash from 'lodash';
+import {EVENTS, GetEvents} from "../singletons/EventSystem";
+import {EVENT_LIST} from "../singletons/EventList";
 
 export default class OBSInterface {
 
@@ -49,6 +51,7 @@ export default class OBSInterface {
 
         this.processController = CreateApplicationController(location, name);
         this.connection = new OBSWebSocket();
+        this.filenameFormatted = undefined;
     }
 
     getSettingsPath() {
@@ -215,21 +218,22 @@ export default class OBSInterface {
 
     async loadFromSettingsRecord() {
         this.filenameFormatted = Settings.getFilenameFormatting();
-        await this.request('SetRecordingFolder', { 'rec-folder': this.getRecordingOutputDirectory() });
+        let outputDir = this.getRecordingOutputDirectory();
+        GetEvents().dispatch(EVENT_LIST.NOTIFY_OBS_SET_OUTPUT_DIR, outputDir);
+        await this.request('SetRecordingFolder', { 'rec-folder': outputDir });
         await this.request('SetFilenameFormatting', { 'filename-formatting': 'footage' });
     }
 
     async moveOutputFile() {
         let outputDir = this.getRecordingOutputDirectory();
         let contents = await FileSystem.readDir(outputDir);
-        console.log(contents);
         let footageFilePath = lodash.find(contents, (item) => path.basename(item, path.extname(item)) === 'footage');
-        console.log(footageFilePath);
         await FileSystem.rename(
             path.resolve(outputDir, footageFilePath),
             path.resolve(outputDir, `${this.filenameFormatted}${path.extname(footageFilePath)}`)
         );
-        delete this.filenameFormatted;
+        GetEvents().dispatch(EVENT_LIST.NOTIFY_OBS_UNSET_OUTPUT_DIR);
+        this.filenameFormatted = undefined;
     }
 
     async loadFromSettingsStream() {

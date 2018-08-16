@@ -5,6 +5,11 @@ import OBSInterface from "../../applications/OBSInterface";
 import {GetLocalData} from "../../singletons/LocalData";
 import CreateApplicationController from "../../applications/CreateApplicationController";
 import DynamicFrame from "../../components/DynamicFrame";
+import {GetEvents} from "../../singletons/EventSystem";
+import {EVENT_LIST} from "../../singletons/EventList";
+import FileSystem from "../../singletons/FileSystem";
+import path from 'path';
+import Viewer from "../viewer/video/Viewer";
 
 export const LAUNCHER_STATUS = Object.freeze(Object.keys({
     AWAITING_LAUNCH: 0,
@@ -37,19 +42,29 @@ export class AppModuleLauncher extends React.Component {
         this.reset = this.reset.bind(this);
         this.renderLauncherStateAsStatus = this.renderLauncherStateAsStatus.bind(this);
         this.renderLauncherStateAsPanel = this.renderLauncherStateAsPanel.bind(this);
+        this.onObsOutputChanged = this.onObsOutputChanged.bind(this);
+        this.generateRandomTimestampFile = this.generateRandomTimestampFile.bind(this);
 
         this.obs = null;
         this.target = null;
+        this.obsOutputDirectory = undefined;
 
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
     }
 
     componentDidMount() {
         GetLocalData().subscribe('launcher.state', 'launcher', this.onStateChanged);
+        GetEvents().subscribe(EVENT_LIST.NOTIFY_OBS_SET_OUTPUT_DIR, 'launcher', this.onObsOutputChanged);
     }
 
     componentWillUnmount() {
         GetLocalData().unsubscribe('launcher.state', 'launcher');
+        GetEvents().unsubscribe(EVENT_LIST.NOTIFY_OBS_SET_OUTPUT_DIR, 'launcher');
+    }
+
+    onObsOutputChanged(dir) {
+        console.log(dir);
+        this.obsOutputDirectory = dir;
     }
 
     async launch() {
@@ -107,6 +122,18 @@ export class AppModuleLauncher extends React.Component {
     async reset() {
         GetLocalData().update("settings.tester.number", 0, (value) => value + 1);
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
+        this.obsOutputDirectory = undefined;
+    }
+
+    async generateRandomTimestampFile() {
+        let outputDir = this.obsOutputDirectory;
+
+        let files = await FileSystem.readDir(outputDir);
+        let footageFile = files.find((file) => path.basename(file, path.extname(file)) === path.basename(outputDir));
+        //console.log(footageFile);
+        // TODO: Maybe use https://github.com/evictor/get-blob-duration for files which dont have audio (mac recordings)
+        //let duration = await Viewer.requestDuration(footageFile);
+        //console.log(duration);
     }
 
     render() {
@@ -222,6 +249,16 @@ export class AppModuleLauncher extends React.Component {
                                 );
                             }}
                         />
+
+                        <Button
+                            fluid
+                            size='small'
+                            color='orange'
+                            attached='bottom'
+                            onClick={this.generateRandomTimestampFile}
+                        >
+                            Generate Random Timestamps
+                        </Button>
 
                         <Button
                             fluid

@@ -124,8 +124,8 @@ export default class Viewer extends React.Component {
         };
     }
 
-    static async requestFileData(fileUrl, responseType='arraybuffer') {
-        return await new Promise((resolve, reject) => {
+    static requestFileData(fileUrl, responseType='arraybuffer') {
+        return new Promise((resolve, reject) => {
             let xhr = new XMLHttpRequest();
             xhr.open('GET', fileUrl, true);
             xhr.responseType = responseType;

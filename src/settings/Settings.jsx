@@ -10,6 +10,7 @@ import {FaDownload, FaSave, FaSync, FaUpload} from "react-icons/fa/index";
 import {SettingsDisplay} from "./SettingsDisplay";
 import {SettingsBtnChangeSensitive} from "./SettingsBtnChangeSensitive";
 import moment from 'moment';
+import {EVENT_LIST} from "../singletons/EventList";
 
 function makeFilenameFormat(momentFormat, description) {
     return {
@@ -68,10 +69,6 @@ export const FILENAME_FORMATS = {
     ],
 };
 
-FILENAME_FORMATS.obs.forEach((item) => {
-    console.log(item.key, item.getValue());
-});
-
 export class Settings extends React.Component {
 
     static getSettings() {
@@ -101,7 +98,7 @@ export class Settings extends React.Component {
         let loadedData = JSON.parse(await FileSystem.readFile(filePath));
         settings = Settings.setSettings(lodash.defaultsDeep(loadedData, settings));
         console.log("Loaded system settings", settings);
-        GetEvents().dispatch("settings|import");
+        GetEvents().dispatch(EVENT_LIST.NOTIFY_SETTINGS_IMPORTED);
     }
 
     static async saveSystemSettings() {
@@ -137,13 +134,13 @@ export class Settings extends React.Component {
     }
 
     componentDidMount() {
-        GetEvents().subscribe("open|settings", "settings", this.handleOpen);
+        GetEvents().subscribe(EVENT_LIST.REQUEST_OPEN_SETTINGS, "settings", this.handleOpen);
         GetLocalData().subscribe('launcher.state', 'settings', this.handleChangeInLauncherState);
         GetLocalData().subscribe('settings', 'settings', this.handleChangeInField);
     }
 
     componentWillUnmount() {
-        GetEvents().unsubscribe("open|settings", "settings");
+        GetEvents().unsubscribe(EVENT_LIST.REQUEST_OPEN_SETTINGS, "settings");
         GetLocalData().unsubscribe('launcher.state', 'settings');
         GetLocalData().unsubscribe('settings', 'settings');
     }
@@ -203,7 +200,7 @@ export class Settings extends React.Component {
 
         let hasChangedFieldsAfterUpdate = hasChangedFields();
         if (hasChangedFieldsAfterUpdate !== hadChangedFields) {
-            GetEvents().dispatch('settings|hasChangedFields', hasChangedFieldsAfterUpdate, this.changedFields);
+            GetEvents().dispatch(EVENT_LIST.NOTIFY_SETTINGS_HAS_CHANGED_FIELDS, hasChangedFieldsAfterUpdate, this.changedFields);
         }
     }
 
@@ -231,7 +228,7 @@ export class Settings extends React.Component {
 
     async handleReset() {
         Settings.setSettings({});
-        GetEvents().dispatch("settings|import");
+        GetEvents().dispatch(EVENT_LIST.NOTIFY_SETTINGS_IMPORTED);
         await Settings.saveSystemSettings();
     }
 

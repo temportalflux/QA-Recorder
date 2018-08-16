@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {Button} from "semantic-ui-react";
 import {GetEvents} from "../singletons/EventSystem";
 import * as lodash from "lodash";
+import {EVENT_LIST} from "../singletons/EventList";
 
 export class SettingsBtnChangeSensitive extends React.Component {
 
@@ -19,11 +20,11 @@ export class SettingsBtnChangeSensitive extends React.Component {
 
     componentDidMount() {
         this.uniqueKey = `settingsBtnChangeSensitive_${this.props.uniqueKey}`;
-        GetEvents().subscribe('settings|hasChangedFields', this.uniqueKey, this.handleChangeInHasChangedFields)
+        GetEvents().subscribe(EVENT_LIST.NOTIFY_SETTINGS_HAS_CHANGED_FIELDS, this.uniqueKey, this.handleChangeInHasChangedFields)
     }
 
     componentWillUnmount() {
-        GetEvents().unsubscribe('settings|hasChangedFields', this.uniqueKey);
+        GetEvents().unsubscribe(EVENT_LIST.NOTIFY_SETTINGS_HAS_CHANGED_FIELDS, this.uniqueKey);
     }
 
     handleChangeInHasChangedFields(hasChangedFields) {

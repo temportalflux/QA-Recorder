@@ -14,7 +14,7 @@ export class LocalData {
     }
 
     _getEventKey(pathArray) {
-        return `localData|${pathArray.join('.')}`;
+        return `notify|localData|changed|${pathArray.join('.')}`;
     }
 
     subscribe(path, handle, func) {

@@ -1,5 +1,6 @@
 import electron from 'electron';
 import {GetEvents} from "./singletons/EventSystem";
+import {EVENT_LIST} from "./singletons/EventList";
 
 /**
  * Initializes the Electron window's menu bar.
@@ -11,7 +12,7 @@ export function initMenu() {
             submenu: [
                 {
                     label: 'Settings',
-                    click: () => GetEvents().dispatch("open|settings"),
+                    click: () => GetEvents().dispatch(EVENT_LIST.REQUEST_OPEN_SETTINGS),
                 },
                 {type: 'separator'},
                 {role: 'minimize'},
@@ -37,11 +38,11 @@ export function initMenu() {
                 {type: 'separator'},
                 {
                     label: 'Open Launcher',
-                    click: () => GetEvents().dispatch("open|module", "launcher"),
+                    click: () => GetEvents().dispatch(EVENT_LIST.REQUEST_OPEN_MODULE, "launcher"),
                 },
                 {
                     label: 'Open Viewer',
-                    click: () => GetEvents().dispatch("open|module", "viewer"),
+                    click: () => GetEvents().dispatch(EVENT_LIST.REQUEST_OPEN_MODULE, "viewer"),
                 },
             ]
         },
