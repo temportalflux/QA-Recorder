@@ -67,11 +67,11 @@ export default class TimestampDisplayBar extends React.Component {
                 <div
                     key={shortid.generate()}
                     style={{
-                        backgroundColor: this.props.bookmarkColor,
-                        height: this.props.height,
                         position: 'absolute',
+                        height: '100%',
                         left: `${bookmark.start * 100}%`,
                         width: `${(bookmark.end - bookmark.start) * 100}%`,
+                        backgroundColor: this.props.bookmarkColor,
                     }}
                 />
             );
@@ -81,21 +81,14 @@ export default class TimestampDisplayBar extends React.Component {
     render() {
         return (
             <div
+                id={'timestamp-display'}
                 style={{
-                    backgroundColor: this.props.backgroundColor,
-                    height: this.props.height,
+                    position: 'absolute',
+                    height: '100%',
+                    width: '100%',
                 }}
             >
                 {this._renderBookmarks()}
-                <div
-                    style={{
-                        backgroundColor: '#000000',
-                        height: this.props.height,
-                        position: 'absolute',
-                        left: `${this.state.currentPlaybackPercent * 100 - this.props.cursorWidth * 0.5}%`,
-                        width: `${this.props.cursorWidth}%`,
-                    }}
-                />
             </div>
         );
     }
@@ -103,8 +96,7 @@ export default class TimestampDisplayBar extends React.Component {
 }
 
 TimestampDisplayBar.defaultProps = {
-    backgroundColor: 'rgba(115, 133, 159, 1.0)',
-    bookmarkColor: 'yellow',
+    bookmarkColor: 'rgba(0, 255, 255, 1.0)',
     height: '1.0em',
     cursorWidth: 0.5,
 

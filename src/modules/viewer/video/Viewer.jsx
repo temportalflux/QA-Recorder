@@ -1,6 +1,7 @@
 import React from 'react';
-import { ControlBar, Player } from 'video-react';
+import { Player } from 'video-react';
 import TimestampDisplayBar from './TimestampDisplayBar';
+import ControlBar from "./monkeypatch/ControlBar";
 
 // https://video-react.js.org/components/player/
 export default class Viewer extends React.Component {
@@ -18,6 +19,7 @@ export default class Viewer extends React.Component {
         this.changePlaybackRateRate = this.changePlaybackRateRate.bind(this);
         this.changeVolume = this.changeVolume.bind(this);
         this.setMuted = this.setMuted.bind(this);
+        this.renderTimestampBar = this.renderTimestampBar.bind(this);
 
         this.state = {
             source: undefined,
@@ -58,6 +60,7 @@ export default class Viewer extends React.Component {
 
     async _loadVideo() {
         let url = 'http://media.w3.org/2010/05/bunny/movie.mp4';
+        // TODO: This uses audio. Please transition to something not reliant on audio.
         let duration = await Viewer.requestDuration(url);
         return {
             source: url,
@@ -168,52 +171,29 @@ export default class Viewer extends React.Component {
         }
     }
 
+    renderTimestampBar(info) {
+        return (
+            <TimestampDisplayBar
+                {...info}
+                totalTimeMs={this.state.duration}
+                timestamps={this.state.timestamps}
+                getPlaybackTime={this._getPlaybackTime}
+            />
+        );
+    }
+
     render() {
         return (
-            <div>
-                <Player
-                    ref="player"
-                    src={this.state.source}
-                    //autoPlay
-                >
-                    <ControlBar autoHide={false}/>
-                </Player>
-                {/*
-                <div className="py-3">
-                    <Button onClick={this.play} className="mr-3">play()</Button>
-                    <Button onClick={this.pause} className="mr-3">pause()</Button>
-                    <Button onClick={this.load} className="mr-3">load()</Button>
-                </div>
-                <div className="pb-3">
-                    <Button onClick={this.changeCurrentTime(10)} className="mr-3">currentTime +=
-                        10</Button>
-                    <Button onClick={this.changeCurrentTime(-10)} className="mr-3">currentTime -=
-                        10</Button>
-                    <Button onClick={this.seek(50)} className="mr-3">currentTime = 50</Button>
-                </div>
-                <div className="pb-3">
-                    <Button onClick={this.changePlaybackRateRate(1)}
-                            className="mr-3">playbackRate++</Button>
-                    <Button onClick={this.changePlaybackRateRate(-1)}
-                            className="mr-3">playbackRate--</Button>
-                    <Button onClick={this.changePlaybackRateRate(0.1)}
-                            className="mr-3">playbackRate+=0.1</Button>
-                    <Button onClick={this.changePlaybackRateRate(-0.1)}
-                            className="mr-3">playbackRate-=0.1</Button>
-                </div>
-                <div className="pb-3">
-                    <Button onClick={this.changeVolume(0.1)} className="mr-3">volume+=0.1</Button>
-                    <Button onClick={this.changeVolume(-0.1)} className="mr-3">volume-=0.1</Button>
-                    <Button onClick={this.setMuted(true)} className="mr-3">muted=true</Button>
-                    <Button onClick={this.setMuted(false)} className="mr-3">muted=false</Button>
-                </div>
-                */}
-                <TimestampDisplayBar
-                    totalTimeMs={this.state.duration}
-                    timestamps={this.state.timestamps}
-                    getPlaybackTime={this._getPlaybackTime}
+            <Player
+                ref="player"
+                src={this.state.source}
+                //autoPlay
+            >
+                <ControlBar
+                    autoHide={false}
+                    renderUnderlay={this.renderTimestampBar}
                 />
-            </div>
+            </Player>
         );
     }
 
