@@ -5,7 +5,7 @@ import * as lodash from "lodash";
 import {GetLocalData} from "../singletons/LocalData";
 import {GetEvents} from "../singletons/EventSystem";
 import {LAUNCHER_STATUS} from "../modules/launcher/AppModuleLauncher";
-import path from 'path';
+import path from "path";
 import {FaDownload, FaSave, FaSync, FaUpload} from "react-icons/fa/index";
 import {SettingsDisplay} from "./SettingsDisplay";
 import {SettingsBtnChangeSensitive} from "./SettingsBtnChangeSensitive";

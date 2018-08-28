@@ -181,6 +181,25 @@ export default class OBSInterface {
         });
     }
 
+    static runIntervalForTimeout(execute, intervalTime, maxAttempts) {
+        return new Promise((resolve, reject) => {
+            let hasMaxAttempts = (maxAttempts || 0) > 0;
+            let makeAttempt;
+            makeAttempt = (attempts) => {
+                if (hasMaxAttempts && attempts >= maxAttempts) {
+                    throw new Error("Max attempts reached.");
+                }
+                else {
+                    return execute().catch(err => {
+                        console.warn(err);
+                        return new Promise(resolve => setTimeout(resolve, intervalTime)).then(() => makeAttempt(attempts + 1));
+                    });
+                }
+            };
+            makeAttempt(0);
+        });
+    }
+
     stop() {
         this.processController.kill();
         this.connected = false;
@@ -228,10 +247,16 @@ export default class OBSInterface {
         let outputDir = this.getRecordingOutputDirectory();
         let contents = await FileSystem.readDir(outputDir);
         let footageFilePath = lodash.find(contents, (item) => path.basename(item, path.extname(item)) === 'footage');
-        await FileSystem.rename(
-            path.resolve(outputDir, footageFilePath),
-            path.resolve(outputDir, `${this.filenameFormatted}${path.extname(footageFilePath)}`)
-        );
+        try {
+            await FileSystem.rename(
+                path.resolve(outputDir, footageFilePath),
+                path.resolve(outputDir, `${this.filenameFormatted}${path.extname(footageFilePath)}`)
+            );
+        }
+        catch (e) {
+            console.log(e);
+            console.error(e);
+        }
         GetEvents().dispatch(EVENT_LIST.NOTIFY_OBS_UNSET_OUTPUT_DIR);
         this.filenameFormatted = undefined;
     }

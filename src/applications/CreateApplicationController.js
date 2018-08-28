@@ -36,9 +36,8 @@ class ApplicationController {
 
         this.executableInfo = undefined;
         if (executablePath !== undefined) {
-            this.executableInfo = executablePath.isRelative
-                ? path.resolve(FileSystem.cwd(), executablePath.path)
-                : executablePath.path;
+            this.executableInfo = FileSystem.resolvePotentialRelative(executablePath);
+            console.log(this.executableInfo);
         }
         if (this.executableInfo !== undefined) {
             this.executableInfo = path.parse(this.executableInfo);

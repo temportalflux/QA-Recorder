@@ -8,8 +8,7 @@ import DynamicFrame from "../../components/DynamicFrame";
 import {GetEvents} from "../../singletons/EventSystem";
 import {EVENT_LIST} from "../../singletons/EventList";
 import FileSystem from "../../singletons/FileSystem";
-import path from 'path';
-import Viewer from "../viewer/video/Viewer";
+import path from "path";
 
 export const LAUNCHER_STATUS = Object.freeze(Object.keys({
     AWAITING_LAUNCH: 0,

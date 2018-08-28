@@ -77,7 +77,7 @@ export const SettingsModuleRecording = (props) => {
                                         defValue = entry.defaultValue;
                                 }
                                 return [
-                                    category === 'obs' ? entry.key : `%${entry.key}`,
+                                    `$\{${entry.key}}`,
                                     entry.description,
                                     defValue
                                 ];
