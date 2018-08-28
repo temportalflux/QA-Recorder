@@ -5,6 +5,8 @@ import {Container, Dropdown, Form} from "semantic-ui-react";
 import {Settings} from "../../settings/Settings";
 import FileSystem from "../../singletons/FileSystem";
 import {GetLocalData} from "../../singletons/LocalData";
+import {listify} from "../../util/listify";
+import path from 'path';
 
 export class AppModuleViewer extends React.Component {
 
@@ -46,13 +48,24 @@ export class AppModuleViewer extends React.Component {
     async onChangedRecordingFolderDataValue() {
         let recordingsPath = this.getRecordingFolderPath();
         let contents = await FileSystem.readDir(recordingsPath);
-        console.log(contents);
+        contents = contents.filter(item => path.extname(item) === '');
+        contents.unshift({});
         this.setState({
             recordingsFolder: recordingsPath,
+            recordingsList: listify(contents),
         });
     }
 
+    handleSelectRecording(e, {value}) {
+        // selected none
+        if (value === undefined) return;
+
+        let fullPath = path.resolve(this.state.recordingsFolder, value);
+
+    }
+
     render() {
+        console.log(this.state);
         return (
             <Container>
                 <Form>
@@ -63,7 +76,8 @@ export class AppModuleViewer extends React.Component {
                             <Dropdown
                                 fluid
                                 search selection
-                                options={[]}
+                                options={this.state.recordingsList}
+                                onChange={this.handleSelectRecording}
                             />
                         </Form.Field>
                     </Form.Group>
