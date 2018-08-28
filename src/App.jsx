@@ -21,7 +21,6 @@ export class App extends React.Component {
         this.state = {
             module: undefined,
         };
-
     }
 
     componentDidMount() {

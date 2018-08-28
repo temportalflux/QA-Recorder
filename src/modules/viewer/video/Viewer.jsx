@@ -60,7 +60,6 @@ export default class Viewer extends React.Component {
 
     async _loadVideo() {
         let url = 'http://media.w3.org/2010/05/bunny/movie.mp4';
-        // TODO: This uses audio. Please transition to something not reliant on audio.
         let duration = await Viewer.requestDuration(url);
         return {
             source: url,
@@ -127,42 +126,21 @@ export default class Viewer extends React.Component {
         };
     }
 
-    static requestFileData(fileUrl, responseType='arraybuffer') {
-        return new Promise((resolve, reject) => {
-            let xhr = new XMLHttpRequest();
-            xhr.open('GET', fileUrl, true);
-            xhr.responseType = responseType;
-            xhr.onload = (e) => {
-                let result = {
-                    response: xhr.response,
-                    status: xhr.status,
-                };
-                if (result.status === 200) {
-                    resolve(result);
-                }
-                else {
-                    reject(result);
-                }
-            };
-            xhr.send();
+    static requestDuration(fileUrl) {
+        return new Promise(resolve => {
+            let video = document.createElement('video');
+            video.src = fileUrl;
+            video.addEventListener('loadedmetadata', (e) => {
+                document.body.removeChild(video);
+                let seconds = Math.floor(video.duration);
+                let ms = (video.duration - seconds) * 1000;
+                resolve({
+                    seconds: seconds,
+                    ms: ms,
+                });
+            });
+            document.body.appendChild(video);
         });
-    }
-
-    static async getDurationFromRequest(arraybufferData) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-        let buffer = await audioCtx.decodeAudioData(arraybufferData);
-        let durationInSeconds = buffer.duration;
-        return durationInSeconds * 1000;
-    }
-
-    static async requestDuration(fileUrl) {
-        let result = await Viewer.requestFileData(fileUrl, 'arraybuffer');
-        if (result.status === 200)
-        {
-            return await Viewer.getDurationFromRequest(result.response);
-        }
-        return 0;
     }
 
     componentDidUpdate(prevProps, prevState) {

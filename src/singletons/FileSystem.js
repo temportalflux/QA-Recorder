@@ -113,7 +113,7 @@ export default class FileSystem {
     }
 
     static chmodWrite(filePath) {
-        return new Promise((resolve, reject) => fs.chmod(filePath, 0o777, (err) => {
+        return new Promise((resolve, reject) => fs.chmod(filePath, '777', (err) => {
             if (!err) resolve();
             else reject(err);
         }));
@@ -126,8 +126,7 @@ export default class FileSystem {
             return true;
         }
         await FileSystem.ensureDirectoryExists(dirname);
-        await new Promise((resolve, reject) => fs.mkdir(dirname, (err) => {
-            console.log(filePath, err);
+        await new Promise((resolve, reject) => fs.mkdir(dirname, 0o777, (err) => {
             if (!err) resolve();
             else reject(err);
         }));
@@ -152,6 +151,25 @@ export default class FileSystem {
                 if (err) reject(err);
                 else resolve();
             });
+        });
+    }
+
+    static waitUntilAvailable(filePath, frequency=100) {
+        return new Promise((resolve, reject) => {
+            let interval = setInterval(() => {
+                fs.open(filePath, 'r+', function(err, fd) {
+                    fs.close(fd, (errClose) => {});
+                    if (err && err.code === 'EBUSY') {
+                        //do nothing till next loop
+                    } else if (err) {
+                        clearInterval(interval);
+                        reject(err);
+                    } else {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                });
+            }, frequency);
         });
     }
 

@@ -24,7 +24,7 @@ export class AppModuleViewer extends React.Component {
 
     componentDidMount() {
         GetLocalData().subscribe(this.getRecordingFolderDataPath(), "module|viewer", this.onChangedRecordingFolderDataValue);
-        this.onChangedRecordingFolderDataValue();
+        let promise = this.onChangedRecordingFolderDataValue();
     }
 
     componentWillUnmount() {
@@ -57,9 +57,16 @@ export class AppModuleViewer extends React.Component {
             <Container>
                 <Form>
 
-                    <Dropdown
-
-                    />
+                    <Form.Group inline widths='equal'>
+                        <Form.Field inline={false}>
+                            <label>Recording</label>
+                            <Dropdown
+                                fluid
+                                search selection
+                                options={[]}
+                            />
+                        </Form.Field>
+                    </Form.Group>
 
                     <Viewer />
 

@@ -246,12 +246,14 @@ export default class OBSInterface {
     async moveOutputFile() {
         let outputDir = this.getRecordingOutputDirectory();
         let contents = await FileSystem.readDir(outputDir);
+        await FileSystem.chmodWrite(outputDir);
         let footageFilePath = lodash.find(contents, (item) => path.basename(item, path.extname(item)) === 'footage');
+        let srcFootagePath = path.resolve(outputDir, footageFilePath);
+        let destFootagePath = path.resolve(outputDir, `${this.filenameFormatted}${path.extname(footageFilePath)}`);
         try {
-            await FileSystem.rename(
-                path.resolve(outputDir, footageFilePath),
-                path.resolve(outputDir, `${this.filenameFormatted}${path.extname(footageFilePath)}`)
-            );
+            await FileSystem.waitUntilAvailable(srcFootagePath, 100);
+            await FileSystem.chmodWrite(srcFootagePath);
+            await FileSystem.rename(srcFootagePath, destFootagePath);
         }
         catch (e) {
             console.log(e);

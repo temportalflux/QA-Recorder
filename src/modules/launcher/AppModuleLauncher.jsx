@@ -9,6 +9,8 @@ import {GetEvents} from "../../singletons/EventSystem";
 import {EVENT_LIST} from "../../singletons/EventList";
 import FileSystem from "../../singletons/FileSystem";
 import path from "path";
+import Viewer from "../viewer/video/Viewer";
+import * as shortid from "shortid";
 
 export const LAUNCHER_STATUS = Object.freeze(Object.keys({
     AWAITING_LAUNCH: 0,
@@ -129,10 +131,72 @@ export class AppModuleLauncher extends React.Component {
 
         let files = await FileSystem.readDir(outputDir);
         let footageFile = files.find((file) => path.basename(file, path.extname(file)) === path.basename(outputDir));
-        //console.log(footageFile);
-        // TODO: Maybe use https://github.com/evictor/get-blob-duration for files which dont have audio (mac recordings)
-        //let duration = await Viewer.requestDuration(footageFile);
-        //console.log(duration);
+        let fullFootagePath = path.resolve(outputDir, footageFile);
+        let {seconds, ms} = await Viewer.requestDuration(fullFootagePath);
+        let totalDuration = Math.floor(seconds * 1000 + ms);
+
+        let rng = {
+            timestampCountRange: {
+                max: 10,
+                min: 1,
+            },
+            msBetweenBookmarks: {
+                min: 0,
+                max: 2 * 1000,
+            },
+            msBookmarkDuration: {
+                min: 5 * 1000,
+                max: 5 * 1000,
+            },
+        };
+
+        let rngInRange = (range) => {
+            return Math.floor(Math.random() * ((range.max || 1) - (range.min || 0))) + (range.min || 0)
+        };
+
+        let bookmarks = [];
+
+        let totalTimeStamps = rngInRange(rng.timestampCountRange);
+
+        console.log(totalDuration);
+        console.log(totalTimeStamps);
+
+        let bookmarkStart = 0;
+        console.log('Gen Start', bookmarkStart);
+        for (let iBookmark = 0; iBookmark < totalTimeStamps; iBookmark++) {
+            console.log('Loop Start', bookmarkStart);
+
+            // ensure still in range
+            if (bookmarkStart >= totalDuration) break;
+
+            console.log('Rng Start for', bookmarkStart);
+
+            // Add a random buffer before
+            bookmarkStart += rngInRange(rng.msBetweenBookmarks);
+            bookmarkStart = Math.min(bookmarkStart, totalDuration);
+
+            console.log('Generating at', bookmarkStart);
+
+            // Create a bookmark duration
+            let bookmark = {
+                start: bookmarkStart,
+                end: bookmarkStart + rngInRange(rng.msBookmarkDuration),
+                comment: shortid.generate(),
+            };
+            // ensure end is within range
+            bookmark.end = Math.min(bookmark.end, totalDuration);
+
+            bookmarks.push(bookmark);
+
+            console.log('Push', bookmark);
+
+            // assign end to start
+            bookmarkStart = bookmark.end;
+        }
+
+        console.log('All', bookmarks);
+
+        await FileSystem.writeFile(path.resolve(outputDir, 'bookmarks.json'), JSON.stringify(bookmarks));
     }
 
     render() {
