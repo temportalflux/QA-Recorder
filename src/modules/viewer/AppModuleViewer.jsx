@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Viewer from "./video/Viewer";
 import {Container, Dropdown, Form} from "semantic-ui-react";
 import {Settings} from "../../settings/Settings";
@@ -7,6 +6,7 @@ import FileSystem from "../../singletons/FileSystem";
 import {GetLocalData} from "../../singletons/LocalData";
 import {listify} from "../../util/listify";
 import path from 'path';
+import * as lodash from "lodash";
 
 export class AppModuleViewer extends React.Component {
 
@@ -17,10 +17,16 @@ export class AppModuleViewer extends React.Component {
         this.getRecordingFolderDataValue = this.getRecordingFolderDataValue.bind(this);
         this.getRecordingFolderPath = this.getRecordingFolderPath.bind(this);
         this.onChangedRecordingFolderDataValue = this.onChangedRecordingFolderDataValue.bind(this);
+        this.handleSelectRecording = this.handleSelectRecording.bind(this);
 
         this.state = {
             recordingsFolder: undefined,
             recordingsList: [],
+
+            currentRecordingPath: undefined,
+            currentRecordingUrl: undefined,
+            currentRecordingDuration: 0,
+            currentRecordingTimestamps: [],
         };
     }
 
@@ -56,16 +62,41 @@ export class AppModuleViewer extends React.Component {
         });
     }
 
-    handleSelectRecording(e, {value}) {
+    async handleSelectRecording(e, {value}) {
         // selected none
-        if (value === undefined) return;
+        if (value === undefined) {
+            this.setState({
+                currentRecordingPath: undefined,
+                currentRecordingUrl: undefined,
+                currentRecordingDuration: 0,
+                currentRecordingTimestamps: [],
+            });
+            return;
+        }
 
         let fullPath = path.resolve(this.state.recordingsFolder, value);
+        let contents = await FileSystem.readDir(fullPath);
+        contents = lodash.keyBy(contents, (fileExtName) => path.basename(fileExtName, path.extname(fileExtName)));
 
+        let videoPath = path.resolve(fullPath, contents[value]);
+
+        let duration = await Viewer.requestDuration(videoPath);
+        duration = duration.seconds * 1000 + duration.ms;
+
+        let timestamps = await FileSystem.readFile(path.resolve(fullPath, contents['bookmarks']));
+        timestamps = JSON.parse(timestamps);
+
+        ///*
+        this.setState({
+            currentRecordingPath: fullPath,
+            currentRecordingUrl: videoPath,
+            currentRecordingDuration: duration,
+            currentRecordingTimestamps: timestamps,
+        });
+        //*/
     }
 
     render() {
-        console.log(this.state);
         return (
             <Container>
                 <Form>
@@ -82,7 +113,11 @@ export class AppModuleViewer extends React.Component {
                         </Form.Field>
                     </Form.Group>
 
-                    <Viewer />
+                    <Viewer
+                        source={this.state.currentRecordingUrl}
+                        duration={this.state.currentRecordingDuration}
+                        timestamps={this.state.currentRecordingTimestamps}
+                    />
 
                 </Form>
             </Container>
