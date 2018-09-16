@@ -75,6 +75,10 @@ export class Settings extends React.Component {
         return GetLocalData().get('settings', {});
     }
 
+    static getSettingsPath() {
+        return path.join(FileSystem.cwd(), 'config.json');
+    }
+
     static setSettings(settings) {
         return GetLocalData().set('settings', settings);
     }
@@ -84,12 +88,13 @@ export class Settings extends React.Component {
     }
 
     static async loadSettings() {
-        let exists = await FileSystem.existsRelative('config.json');
+        let settingsPath = Settings.getSettingsPath();
+        let exists = await FileSystem.exists(settingsPath);
         if (exists) {
-            await Settings.importSystemSettings(path.join(FileSystem.cwd(), 'config.json'));
+            await Settings.importSystemSettings(settingsPath);
         }
         else {
-            await Settings.saveSystemSettings();
+            await Settings.saveSystemSettings(settingsPath);
         }
     }
 
@@ -101,11 +106,12 @@ export class Settings extends React.Component {
         GetEvents().dispatch(EVENT_LIST.NOTIFY_SETTINGS_IMPORTED);
     }
 
-    static async saveSystemSettings() {
-        await Settings.exportSystemSettings(path.join(FileSystem.cwd(), 'config.json'));
+    static async saveSystemSettings(filePath) {
+        await Settings.exportSystemSettings(filePath);
     }
 
     static async exportSystemSettings(filePath) {
+        await FileSystem.ensureDirectoryExists(filePath);
         let settings = Settings.getSettings();
         console.log("Saving system settings to", filePath, settings);
         await FileSystem.writeFile(filePath, JSON.stringify(settings, undefined, 4));
@@ -167,7 +173,7 @@ export class Settings extends React.Component {
     }
 
     handleSaveAndClose() {
-        let promise = Settings.saveSystemSettings();
+        let promise = Settings.saveSystemSettings(Settings.getSettingsPath());
         this.setState({
             isOpen: false,
             snapshot: undefined,
@@ -223,13 +229,13 @@ export class Settings extends React.Component {
         });
         if (!filePath[0]) return;
         await Settings.importSystemSettings(filePath[0], Settings.getSettings());
-        await Settings.saveSystemSettings();
+        await Settings.saveSystemSettings(Settings.getSettingsPath());
     }
 
     async handleReset() {
         Settings.setSettings({});
         GetEvents().dispatch(EVENT_LIST.NOTIFY_SETTINGS_IMPORTED);
-        await Settings.saveSystemSettings();
+        await Settings.saveSystemSettings(Settings.getSettingsPath());
     }
 
     render() {

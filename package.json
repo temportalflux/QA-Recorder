@@ -1,6 +1,6 @@
 {
     "name": "qarecorder",
-    "productName": "QA Recorder",
+    "productName": "QARecorder",
     "version": "1.0.1",
     "description": "A ReactJS application to assist with the recording and review of quality-assurance tester gameplay.",
     "license": "MIT",
@@ -12,7 +12,8 @@
     "main": "src/index.js",
     "scripts": {
         "start": "electron-forge start",
-        "build": "electron-builder"
+        "build": "electron-builder",
+        "postinstall": "electron-builder install-app-deps"
     },
     "repository": {
         "type": "git",
@@ -58,7 +59,9 @@
         "classnames": "^2.2.6",
         "electron-compile": "^6.4.3",
         "electron-devtools-installer": "^2.2.4",
+        "electron-is-dev": "^0.3.0",
         "electron-squirrel-startup": "^1.0.0",
+        "fs-extra": "^7.0.0",
         "hoek": "^5.0.3",
         "install": "^0.12.1",
         "lodash": "^4.17.10",
@@ -77,6 +80,7 @@
         "video-react": "^0.13.0"
     },
     "devDependencies": {
+        "electron": "^2.0.9",
         "babel-plugin-transform-async-to-generator": "^6.24.1",
         "babel-plugin-transform-es2015-classes": "^6.24.1",
         "babel-preset-env": "^1.7.0",
@@ -97,7 +101,8 @@
             "package.json",
             "dist/",
             "node_modules/",
-            "src/"
+            "src/",
+            "resources/"
         ],
         "dmg": {
             "contents": [
@@ -114,7 +119,8 @@
             ]
         },
         "win": {
-            "target": "nsis"
+            "target": "portable",
+            "icon": "resources/icon.ico"
         },
         "linux": {
             "target": [

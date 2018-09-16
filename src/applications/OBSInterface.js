@@ -111,6 +111,7 @@ export default class OBSInterface {
 
     getProfilePath() {
         let pathSettings = GetLocalData().get('settings.obs.profile');
+        console.log(pathSettings, FileSystem.resolvePotentialRelative(pathSettings));
         return pathSettings !== undefined ? FileSystem.resolvePotentialRelative(pathSettings): undefined;
     }
 

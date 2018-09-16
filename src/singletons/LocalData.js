@@ -27,6 +27,7 @@ export class LocalData {
 
     set(path, value) {
         lodash.set(this.data, path, value);
+        console.log(this.data, path);
         let currentPath = lodash.toPath(path);
         while (currentPath.length > 0)
         {

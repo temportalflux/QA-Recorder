@@ -6,12 +6,17 @@ import fsextra from 'fs-extra';
 
 export default class FileSystem {
 
+    static getAppPath() {
+        return remote.app.getAppPath();
+    }
+
     static getPath(key) {
         return path.normalize(remote.app.getPath(key));
     }
 
     static cwd() {
-        return FileSystem.getPath('userData');
+        //return FileSystem.getPath('userData');
+        return `${FileSystem.appData()}/QARecorder`;
     }
 
     static appData() {
@@ -44,7 +49,9 @@ export default class FileSystem {
     }
 
     static resolvePotentialRelative(pathObject) {
-        return pathObject.isRelative ? path.resolve(FileSystem.cwd(), pathObject.path) : pathObject.path;
+        if (pathObject.isRelative)
+            console.log(FileSystem.getPath('exe'), pathObject.path, path.resolve(FileSystem.getPath('exe'), pathObject.path));
+        return pathObject.isRelative ? path.resolve(FileSystem.getPath('exe'), pathObject.path) : pathObject.path;
     }
 
     static exists(filePath) {
@@ -52,7 +59,7 @@ export default class FileSystem {
     }
 
     static async existsRelative(filePath) {
-        return await FileSystem.exists(path.join(FileSystem.cwd(), filePath));
+        return await FileSystem.exists(path.join(FileSystem.getPath('exe'), filePath));
     }
 
     static readFile(filePath) {
@@ -69,7 +76,7 @@ export default class FileSystem {
     }
 
     static async readFileRelative(filePath) {
-        return await FileSystem.readFile(path.join(FileSystem.cwd(), filePath));
+        return await FileSystem.readFile(path.join(FileSystem.getPath('exe'), filePath));
     }
 
     static readDir(filePath) {
@@ -95,7 +102,7 @@ export default class FileSystem {
     }
 
     static async writeFileRelative(filePath, data) {
-        return await FileSystem.writeFile(path.join(FileSystem.cwd(), filePath), data);
+        return await FileSystem.writeFile(path.join(FileSystem.getPath('exe'), filePath), data);
     }
 
     static displayDialog(options) {

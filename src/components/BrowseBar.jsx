@@ -18,9 +18,9 @@ export default class BrowseBar extends React.Component {
         this._setPath = this._setPath.bind(this);
 
         let pathValue = GetLocalData().get(`${this.props.path}.path`, '');
-        let isRelative = GetLocalData().get(`${this.props.path}.relative`, false);
+        let isRelative = GetLocalData().get(`${this.props.path}.isRelative`, false);
         this.state = {
-            value: !isRelative ? pathValue : path.resolve(FileSystem.cwd(), pathValue),
+            value: !isRelative ? pathValue : path.resolve(FileSystem.getPath('exe'), pathValue),
             isRelative: isRelative,
         };
 
@@ -50,7 +50,7 @@ export default class BrowseBar extends React.Component {
     _handleToggleRelative(e, {checked}) {
         if (checked !== this.state.isRelative) {
             this._setPath(this.state.value, checked);
-            GetLocalData().set(`${this.props.path}.relative`, checked);
+            GetLocalData().set(`${this.props.path}.isRelative`, checked);
         }
         this.setState({
             isRelative: checked,
@@ -59,11 +59,12 @@ export default class BrowseBar extends React.Component {
 
     _setPath(value, isRelative) {
         this.setState({ value: value });
-        value = path.normalize(value);
+        let value2 = path.normalize(value);
         if (isRelative) {
-            value = path.relative(FileSystem.cwd(), value);
+            value2 = path.relative(FileSystem.getPath('exe'), value2);
+            console.log(value2, FileSystem.getPath('exe'), value);
         }
-        GetLocalData().set(`${this.props.path}.path`, value);
+        GetLocalData().set(`${this.props.path}.path`, value2);
     }
 
     render() {
