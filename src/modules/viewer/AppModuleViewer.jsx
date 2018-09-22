@@ -83,8 +83,16 @@ export class AppModuleViewer extends React.Component {
         let duration = await Viewer.requestDuration(videoPath);
         duration = duration.seconds * 1000 + duration.ms;
 
-        let timestamps = await FileSystem.readFile(path.resolve(fullPath, contents['bookmarks']));
-        timestamps = JSON.parse(timestamps);
+        let timestamps = [];
+        if (contents.hasOwnProperty('bookmarks'))
+        {
+            let pathBookmarks = path.resolve(fullPath, contents['bookmarks']);
+            let bookmarksExist = await FileSystem.exists(pathBookmarks);
+            if (bookmarksExist) {
+                timestamps = await FileSystem.readFile(pathBookmarks);
+                timestamps = JSON.parse(timestamps);
+            }
+        }
 
         ///*
         this.setState({

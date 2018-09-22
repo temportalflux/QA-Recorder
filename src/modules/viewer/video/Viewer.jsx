@@ -143,6 +143,7 @@ export default class Viewer extends React.Component {
 
         return (
             <div>
+
                 <Player
                     ref="player"
                     src={this.props.source}
@@ -154,7 +155,9 @@ export default class Viewer extends React.Component {
                     />
                 </Player>
 
+                <Header>Comment(s):</Header>
                 <Segment>
+                    {timestamps.length <= 0 && <p>No comments at this timestamp.</p>}
                     {timestamps.map((timestamp) => {
                         let start = timestamp.start;
                         let end = timestamp.end !== undefined ? timestamp.end : (timestamp.duration + start);
@@ -167,6 +170,11 @@ export default class Viewer extends React.Component {
                             </div>
                         );
                     })}
+                </Segment>
+
+                <Header>Form Response:</Header>
+                <Segment>
+                    No form data loaded.
                 </Segment>
 
             </div>
