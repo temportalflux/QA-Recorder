@@ -18,6 +18,7 @@
     "react-scripts": "1.1.4",
     "react-static": "^5.9.7",
     "shallowequal": "^1.1.0",
+    "semantic-ui-react": "^0.79.1",
     "react-markdown": "^3.4.1"
   },
   "devDependencies": {
