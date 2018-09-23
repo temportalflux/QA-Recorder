@@ -20,7 +20,7 @@ export default class BrowseBar extends React.Component {
         let pathValue = GetLocalData().get(`${this.props.path}.path`, '');
         let isRelative = GetLocalData().get(`${this.props.path}.isRelative`, false);
         this.state = {
-            value: !isRelative ? pathValue : path.resolve(FileSystem.getPath('exe'), pathValue),
+            value: pathValue ? (!isRelative ? pathValue : path.resolve(FileSystem.getPath('exe'), pathValue)) : "",
             isRelative: isRelative,
         };
 
@@ -59,12 +59,15 @@ export default class BrowseBar extends React.Component {
 
     _setPath(value, isRelative) {
         this.setState({ value: value });
-        let value2 = path.normalize(value);
-        if (isRelative) {
-            value2 = path.relative(FileSystem.getPath('exe'), value2);
-            console.log(value2, FileSystem.getPath('exe'), value);
+        let valueOut = value;
+        if (value) {
+            valueOut = path.normalize(value);
+            if (isRelative) {
+                valueOut = path.relative(FileSystem.getPath('exe'), valueOut);
+                //console.log(value2, FileSystem.getPath('exe'), value);
+            }
         }
-        GetLocalData().set(`${this.props.path}.path`, value2);
+        GetLocalData().set(`${this.props.path}.path`, valueOut);
     }
 
     render() {

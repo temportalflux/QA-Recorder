@@ -369,9 +369,21 @@ export class AppModuleLauncher extends React.Component {
             default:
                 return (
                     <div>
-                        <Header size={'medium'} textAlign='center'>
-                            Launch the game to get started!
-                        </Header>
+                        <LocalDataDisplay
+                            path={`settings.tester.launchDisplay`}
+                            defaultValue={undefined}
+                            parseValue={(value) => {
+                                let rawPath = value && value.hasOwnProperty('path') ? value.path : undefined;
+                                if (!rawPath) return <div/>;
+                                let resolved = FileSystem.resolvePotentialRelative(value);
+                                return (
+                                    <DynamicFrame
+                                        fluid
+                                        src={resolved}
+                                    />
+                                );
+                            }}
+                        />
 
                         <Button
                             fluid

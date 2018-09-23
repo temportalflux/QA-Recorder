@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {Form} from "semantic-ui-react";
 import InputSaved from "../components/InputSaved";
 import NumericInputSaved from "../components/NumericInputSaved";
+import BrowseBar from "../components/BrowseBar";
 
 export const SettingsModuleTester = (props) => {
     return (
@@ -18,6 +19,16 @@ export const SettingsModuleTester = (props) => {
                 <NumericInputSaved
                     path={`${props.path}.number`}
                     min={0}
+                />
+            </Form.Field>
+
+            <Form.Field disabled={props.shouldBeDisabled()}>
+                <label>Launch Display</label>
+                <BrowseBar
+                    filters={[
+                        {name: 'HTML', extensions: ['html']},
+                    ]}
+                    path={`${props.path}.launchDisplay`}
                 />
             </Form.Field>
 
