@@ -11,6 +11,7 @@ import FileSystem from "../../singletons/FileSystem";
 import path from "path";
 import Viewer from "../viewer/video/Viewer";
 import * as shortid from "shortid";
+import {Settings} from "../../settings/Settings";
 
 export const LAUNCHER_STATUS = Object.freeze(Object.keys({
     AWAITING_LAUNCH: 0,
@@ -130,6 +131,10 @@ export class AppModuleLauncher extends React.Component {
         GetLocalData().update("settings.tester.number", 0, (value) => value + 1);
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
         this.obsOutputDirectory = undefined;
+
+        this.setState({
+            formSubmitted: false,
+        });
     }
 
     async generateRandomTimestampFile() {
@@ -321,7 +326,7 @@ export class AppModuleLauncher extends React.Component {
                                 return (
                                     <DynamicFrame
                                         fluid
-                                        src={value}
+                                        src={Settings.formatString(value).replace(Settings.getRegexForKey('recordingFilename'), path.basename(this.obsOutputDirectory))}
                                     />
                                 );
                             }}

@@ -293,22 +293,28 @@ export class Settings extends React.Component {
     }
 
     static getFilenameFormatting() {
-        let filename = GetLocalData().get(`settings.record.filename`, '${YYYY}-${MM}-${DD}_${HH}-${mm}-${ss}_${ZZ}');
+        return this.formatString(GetLocalData().get(`settings.record.filename`, '${YYYY}-${MM}-${DD}_${HH}-${mm}-${ss}_${ZZ}'));
+    }
 
-        filename = FILENAME_FORMATS.obs.reduce((filenameFormat, format) => {
-            return filenameFormat.replace(new RegExp(`\\\${${format.key}}`, 'g'), format.getValue());
-        }, filename);
+    static getRegexForKey(key) {
+        return new RegExp(`\\\${${key}}`, 'g');
+    }
 
-        filename = FILENAME_FORMATS.custom.reduce((filenameFormat, keyPath) => {
+    static formatString(str) {
+        str = FILENAME_FORMATS.obs.reduce((filenameFormat, format) => {
+            return filenameFormat.replace(this.getRegexForKey(format.key), format.getValue());
+        }, str);
+
+        str = FILENAME_FORMATS.custom.reduce((filenameFormat, keyPath) => {
             // TODO: Do OBS settings too
             let value = GetLocalData().get(keyPath.path, keyPath.defaultValue);
             if (keyPath.parseValue) {
                 value = keyPath.parseValue(value);
             }
-            return filenameFormat.replace(new RegExp(`\\\${${keyPath.key}}`, 'g'), value);
-        }, filename);
+            return filenameFormat.replace(this.getRegexForKey(keyPath.key), value);
+        }, str);
 
-        return filename;
+        return str;
     }
 
 }
