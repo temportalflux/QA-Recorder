@@ -1,8 +1,8 @@
 import React from 'react';
-import {Button, Header, Segment} from "semantic-ui-react";
+import {Button, Checkbox, Divider, Form, Header, Segment} from "semantic-ui-react";
 import LocalDataDisplay from "../../components/LocalDataDisplay";
 import OBSInterface from "../../applications/OBSInterface";
-import {GetLocalData} from "../../singletons/LocalData";
+import {GetLocalData, LocalData} from "../../singletons/LocalData";
 import CreateApplicationController from "../../applications/CreateApplicationController";
 import DynamicFrame from "../../components/DynamicFrame";
 import {GetEvents} from "../../singletons/EventSystem";
@@ -46,11 +46,17 @@ export class AppModuleLauncher extends React.Component {
         this.onObsOutputChanged = this.onObsOutputChanged.bind(this);
         this.generateRandomTimestampFile = this.generateRandomTimestampFile.bind(this);
 
+        this.handleCheckedFormSubmitted = this.handleCheckedFormSubmitted.bind(this);
+
         this.obs = null;
         this.target = null;
         this.obsOutputDirectory = undefined;
 
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
+
+        this.state = {
+            formSubmitted: false,
+        };
     }
 
     componentDidMount() {
@@ -199,6 +205,12 @@ export class AppModuleLauncher extends React.Component {
         await FileSystem.writeFile(path.resolve(outputDir, 'bookmarks.json'), JSON.stringify(bookmarks));
     }
 
+    handleCheckedFormSubmitted(e, {checked}) {
+        this.setState({
+            formSubmitted: checked,
+        });
+    }
+
     render() {
         return (
             <div>
@@ -293,6 +305,8 @@ export class AppModuleLauncher extends React.Component {
                     </div>
                 );
             case LAUNCHER_STATUS.SESSION_COMPLETE:
+                let formLink = GetLocalData().get('settings.tester.formLink', undefined);
+                let canShowReset = !formLink || this.state.formSubmitted;
                 return (
                     <div>
                         <Header size={'medium'} textAlign='center'>
@@ -313,6 +327,7 @@ export class AppModuleLauncher extends React.Component {
                             }}
                         />
 
+                        {/*
                         <Button
                             fluid
                             size='small'
@@ -322,16 +337,32 @@ export class AppModuleLauncher extends React.Component {
                         >
                             Generate Random Timestamps
                         </Button>
+                        */}
 
-                        <Button
-                            fluid
-                            size='small'
-                            color='green'
-                            attached='bottom'
-                            onClick={this.reset}
-                        >
-                            Reset
-                        </Button>
+                        <Divider />
+
+                        {formLink &&
+                            <Form>
+                                <Form.Field>
+                                    <Checkbox label='I have submitted my survey' onClick={this.handleCheckedFormSubmitted}/>
+                                </Form.Field>
+                            </Form>
+                        }
+
+                        <Divider hidden />
+
+                        {canShowReset &&
+                            <Button
+                                fluid
+                                size='small'
+                                color='green'
+                                attached='bottom'
+                                onClick={this.reset}
+                            >
+                                Reset
+                            </Button>
+                        }
+
                     </div>
                 );
             case LAUNCHER_STATUS.AWAITING_LAUNCH:

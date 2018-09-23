@@ -94,14 +94,12 @@ export class AppModuleViewer extends React.Component {
             }
         }
 
-        ///*
         this.setState({
             currentRecordingPath: fullPath,
             currentRecordingUrl: videoPath,
             currentRecordingDuration: duration,
             currentRecordingTimestamps: timestamps,
         });
-        //*/
     }
 
     render() {
