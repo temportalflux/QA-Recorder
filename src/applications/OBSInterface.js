@@ -119,6 +119,7 @@ export default class OBSInterface {
         let set = this.getSceneCollectionPathSet();
         if (set === undefined) return;
         let { sceneCollectionPathSrc, sceneCollectionPathDest } = set;
+        await FileSystem.ensureDirectoryExists(sceneCollectionPathDest);
         await FileSystem.copyTo(sceneCollectionPathSrc, sceneCollectionPathDest);
     }
 
