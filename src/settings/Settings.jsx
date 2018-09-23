@@ -120,6 +120,8 @@ export class Settings extends React.Component {
     constructor(props) {
         super(props);
 
+        this.takeSnapshot = this.takeSnapshot.bind(this);
+        this.revokeSnapshot = this.revokeSnapshot.bind(this);
         this.handleOpen = this.handleOpen.bind(this);
         this.handleChangeInLauncherState = this.handleChangeInLauncherState.bind(this);
         this.handleChangeInField = this.handleChangeInField.bind(this);
@@ -151,10 +153,19 @@ export class Settings extends React.Component {
         GetLocalData().unsubscribe('settings', 'settings');
     }
 
+    takeSnapshot(currentSnapshot, otherOptions) {
+        otherOptions.snapshot = currentSnapshot || lodash.cloneDeep(Settings.getSettings());
+        this.setState(otherOptions, () => console.log(this.state.snapshot));
+    }
+
+    revokeSnapshot(otherOptions) {
+        otherOptions.snapshot = undefined;
+        this.setState(otherOptions, () => console.log(this.state.snapshot));
+    }
+
     handleOpen() {
-        this.setState({
+        this.takeSnapshot(this.state.snapshot, {
             isOpen: true,
-            snapshot: this.state.snapshot || lodash.cloneDeep(Settings.getSettings()),
         });
     }
 
@@ -166,17 +177,15 @@ export class Settings extends React.Component {
 
     handleCancel() {
         GetLocalData().set('settings', this.state.snapshot);
-        this.setState({
+        this.revokeSnapshot({
             isOpen: false,
-            snapshot: undefined,
         });
     }
 
-    handleSaveAndClose() {
-        let promise = Settings.saveSystemSettings(Settings.getSettingsPath());
-        this.setState({
+    async handleSaveAndClose() {
+        await Settings.saveSystemSettings(Settings.getSettingsPath());
+        this.revokeSnapshot({
             isOpen: false,
-            snapshot: undefined,
         });
     }
 
@@ -191,9 +200,6 @@ export class Settings extends React.Component {
     handleChangeInField(value, pathKey) {
         if (!pathKey.startsWith('settings.')) return;
 
-        let hasChangedFields = () => !lodash.isEmpty(this.changedFields);
-        let hadChangedFields = hasChangedFields();
-
         let snapshotValue = lodash.get(this.state.snapshot, pathKey.substring('settings.'.length), undefined);
         let valueMatchesSnapshot = lodash.isEqual(value, snapshotValue);
         if (!valueMatchesSnapshot)
@@ -204,10 +210,7 @@ export class Settings extends React.Component {
             delete this.changedFields[pathKey];
         }
 
-        let hasChangedFieldsAfterUpdate = hasChangedFields();
-        if (hasChangedFieldsAfterUpdate !== hadChangedFields) {
-            GetEvents().dispatch(EVENT_LIST.NOTIFY_SETTINGS_HAS_CHANGED_FIELDS, hasChangedFieldsAfterUpdate, this.changedFields);
-        }
+        GetEvents().dispatch(EVENT_LIST.NOTIFY_SETTINGS_HAS_CHANGED_FIELDS, this.changedFields);
     }
 
     async handleExport() {
@@ -230,6 +233,7 @@ export class Settings extends React.Component {
         if (!filePath[0]) return;
         await Settings.importSystemSettings(filePath[0], Settings.getSettings());
         await Settings.saveSystemSettings(Settings.getSettingsPath());
+        this.takeSnapshot(undefined, {});
     }
 
     async handleReset() {

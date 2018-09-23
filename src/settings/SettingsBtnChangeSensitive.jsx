@@ -27,8 +27,8 @@ export class SettingsBtnChangeSensitive extends React.Component {
         GetEvents().unsubscribe(EVENT_LIST.NOTIFY_SETTINGS_HAS_CHANGED_FIELDS, this.uniqueKey);
     }
 
-    handleChangeInHasChangedFields(hasChangedFields) {
-        this.setState({ hasChangedFields: hasChangedFields });
+    handleChangeInHasChangedFields(changedFields) {
+        this.setState({ hasChangedFields: Object.keys(changedFields).length > 0 });
     }
 
     render() {
