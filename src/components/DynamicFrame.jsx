@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Loading} from "./Loading";
+import FileSystem from "../singletons/FileSystem";
+import path from 'path';
 
 export default class DynamicFrame extends React.Component {
 
@@ -8,17 +10,42 @@ export default class DynamicFrame extends React.Component {
         super(props);
 
         this.handleOnLoad = this.handleOnLoad.bind(this);
+        this.loadFile = this.loadFile.bind(this);
 
+        this.frame = React.createRef();
+
+        this.state = {
+            html: "",
+            height: undefined,
+        };
+    }
+
+    componentDidMount() {
+        let promise = this.loadFile();
+    }
+
+    async loadFile() {
+        let contents = await FileSystem.readFile(this.props.src);
+        contents = contents.replace(
+            new RegExp('\\\${dir}', 'g'), path.dirname(this.props.src)
+        );
+        this.setState({
+            html: contents,
+        });
     }
 
     handleOnLoad() {
         if (this.props.fluid) {
-            this.refs.frame.height = this.refs.frame.contentWindow.document.body.scrollHeight + "px";
+            this.setState({
+                height: this.frame.current.contentWindow.document.body.scrollHeight,
+            });
         }
     }
 
     render() {
-        let style = {};
+        let style = {
+            overflow: "hidden",
+        };
         if (this.props.width) {
             style.width = this.props.width;
         }
@@ -28,11 +55,15 @@ export default class DynamicFrame extends React.Component {
         if (this.props.height) {
             style.height = this.props.height;
         }
+        else if (this.state.height) {
+            style.height = `${this.state.height}px`;
+        }
 
         return (
             <iframe
-                ref={'frame'}
-                src={this.props.src}
+                ref={this.frame}
+                scrolling="no"
+                src={`data:text/html;charset=utf-8,${this.state.html}`}
                 style={style}
                 onLoad={this.handleOnLoad}
                 frameBorder="0"

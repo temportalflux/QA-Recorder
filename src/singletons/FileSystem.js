@@ -64,7 +64,7 @@ export default class FileSystem {
 
     static readFile(filePath) {
         return new Promise((resolve, reject) => {
-           fs.readFile(filePath, (err, data) => {
+           fs.readFile(filePath, "utf8", (err, data) => {
                 if (err) {
                     reject(err);
                 }
