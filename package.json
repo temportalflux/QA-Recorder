@@ -1,7 +1,7 @@
 {
     "name": "qarecorder",
     "productName": "QARecorder",
-    "version": "1.0.",
+    "version": "1.0.2",
     "description": "A ReactJS application to assist with the recording and review of quality-assurance tester gameplay.",
     "license": "MIT",
     "author": {
