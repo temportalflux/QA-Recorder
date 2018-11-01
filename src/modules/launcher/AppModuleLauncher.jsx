@@ -54,6 +54,7 @@ export class AppModuleLauncher extends React.Component {
         this.obsOutputDirectory = undefined;
 
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.AWAITING_LAUNCH);
+        //AppModuleLauncher.setStatus(LAUNCHER_STATUS.SESSION_COMPLETE);
 
         this.state = {
             formSubmitted: false,
@@ -275,6 +276,21 @@ export class AppModuleLauncher extends React.Component {
         return <label>{text}</label>;
     }
 
+    static ValidURL(str) {
+        var pattern = new RegExp('^(https?:\/\/)?'+ // protocol
+            '((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|'+ // domain name
+            '((\d{1,3}\.){3}\d{1,3}))'+ // OR ip (v4) address
+            '(\:\d+)?(\/[-a-z\d%_.~+]*)*'+ // port and path
+            '(\?[;&a-z\d%_.~+=-]*)?'+ // query string
+            '(\#[-a-z\d_]*)?$','i'); // fragment locater
+        if(!pattern.test(str)) {
+            alert("Please enter a valid URL.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     renderLauncherStateAsPanel(state) {
         switch (state) {
             case LAUNCHER_STATUS.LOADING_OBS_SETTINGS_FILES:
@@ -323,10 +339,14 @@ export class AppModuleLauncher extends React.Component {
                             defaultValue={undefined}
                             parseValue={(value) => {
                                 if (!value) return <div/>;
+                                let recordingFilenameKey = Settings.getRegexForKey('recordingFilename');
+                                let recordingFilenameValue = path.basename(this.obsOutputDirectory || "");
+                                let formattedLink = Settings.formatString(value).replace(recordingFilenameKey, recordingFilenameValue);
                                 return (
                                     <DynamicFrame
                                         fluid
-                                        src={Settings.formatString(value).replace(Settings.getRegexForKey('recordingFilename'), path.basename(this.obsOutputDirectory))}
+                                        type={'url'}
+                                        src={formattedLink}
                                     />
                                 );
                             }}
@@ -348,9 +368,11 @@ export class AppModuleLauncher extends React.Component {
 
                         {formLink &&
                             <Form>
-                                <Form.Field>
-                                    <Checkbox label='I have submitted my survey' onClick={this.handleCheckedFormSubmitted}/>
-                                </Form.Field>
+                                <center>
+                                    <Form.Field>
+                                        <Checkbox label='I have submitted my survey' onClick={this.handleCheckedFormSubmitted}/>
+                                    </Form.Field>
+                                </center>
                             </Form>
                         }
 
@@ -384,11 +406,14 @@ export class AppModuleLauncher extends React.Component {
                                 return (
                                     <DynamicFrame
                                         fluid
+                                        type={"url"}
                                         src={resolved}
                                     />
                                 );
                             }}
                         />
+
+                        <Divider hidden />
 
                         <Button
                             fluid

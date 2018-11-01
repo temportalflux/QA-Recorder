@@ -27,6 +27,7 @@ export const SettingsModuleTester = (props) => {
                 <BrowseBar
                     filters={[
                         {name: 'HTML', extensions: ['html']},
+                        {name: 'JSX', extensions: ['jsx']},
                     ]}
                     path={`${props.path}.launchDisplay`}
                 />

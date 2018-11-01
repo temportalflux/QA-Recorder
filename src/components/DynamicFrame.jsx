@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {Loading} from "./Loading";
 import FileSystem from "../singletons/FileSystem";
 import path from 'path';
+import Resizable from 're-resizable';
 
 export default class DynamicFrame extends React.Component {
 
@@ -21,7 +22,10 @@ export default class DynamicFrame extends React.Component {
     }
 
     componentDidMount() {
-        let promise = this.loadFile();
+        if (this.props.type === "file")
+        {
+            let promise = this.loadFile();
+        }
     }
 
     async loadFile() {
@@ -43,6 +47,13 @@ export default class DynamicFrame extends React.Component {
     }
 
     render() {
+        let isJSX = path.extname(this.props.src) === ".jsx";
+
+        if (isJSX && this.state.html) {
+            let jsx = require(this.state.html);
+            //return React.render(this.state.html);
+        }
+
         let style = {
             overflow: "hidden",
         };
@@ -59,21 +70,39 @@ export default class DynamicFrame extends React.Component {
             style.height = `${this.state.height}px`;
         }
 
+        let content;
+        if (this.props.type === "file")
+            content = `data:text/html;charset=utf-8,${this.state.html}`;
+        if (this.props.type === "url")
+            content = this.props.src;
+
         return (
-            <iframe
-                ref={this.frame}
-                scrolling="no"
-                src={`data:text/html;charset=utf-8,${this.state.html}`}
-                style={style}
-                onLoad={this.handleOnLoad}
-                frameBorder="0"
-                marginHeight="0"
-                marginWidth="0"
+            <Resizable
+                minWidth={"100%"}
+                maxWidth={"100%"}
+                size={{
+                    height: this.state.height > 0 ? `${this.state.height}px` : "600pt"
+                }}
             >
-                <Loading>
-                    Loading...
-                </Loading>
-            </iframe>
+                <iframe
+                    ref={this.frame}
+                    scrolling="no"
+                    src={content}
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                    }}
+                    onLoad={this.handleOnLoad}
+                    frameBorder="0"
+                    marginHeight="0"
+                    marginWidth="0"
+                    allowFullScreen={"true"}
+                >
+                    <Loading>
+                        Loading...
+                    </Loading>
+                </iframe>
+            </Resizable>
         );
     }
 
@@ -83,11 +112,11 @@ DynamicFrame.defaultProps = {
     fluid: false,
     width: undefined,
     height: undefined,
-
 };
 
 DynamicFrame.propTypes = {
     src: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(["url", "file"]).isRequired,
 
     fluid: PropTypes.bool,
     width: PropTypes.string,
