@@ -97,7 +97,7 @@ export class AppModuleLauncher extends React.Component {
         if (argStr) args = argStr.split(' ');
         args = args.map((arg) => {
             return Settings.formatString(arg)
-                .replace(Settings.getRegexForKey('outputDir'), this.obsOutputDirectory)
+                .replace(Settings.getRegexForKey('outputDir'), this.obsOutputDirectory).replace(/\\/g, "/")
                 .replace(Settings.getRegexForKey('recordingFilename'), path.basename(this.obsOutputDirectory || ""))
                 ;
         });
