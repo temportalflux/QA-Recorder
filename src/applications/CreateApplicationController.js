@@ -1,22 +1,22 @@
-import { spawn, execFile } from "child_process";
+import { spawn } from "child_process";
 import FileSystem from "../singletons/FileSystem";
 import path from 'path';
 
-export default function CreateApplicationController(executable, events) {
+export default function CreateApplicationController(executable, args, events) {
     switch (process.platform) {
         case 'aix':
         case 'freebsd':
         case 'linux':
         case 'openbsd':
         case 'sunos':
-            return new APUnix(executable['linux'], events);
+            return new APUnix(executable['linux'], args, events);
         case 'darwin':
-            return new APMac(executable['osx'], events);
+            return new APMac(executable['osx'], args, events);
         case 'win32':
             if (process.arch === 'x64')
-                return new APWindows(executable['windows64'], events);
+                return new APWindows(executable['windows64'], args, events);
             else
-                return new APWindows(executable['windows32'], events);
+                return new APWindows(executable['windows32'], args, events);
         default:
             break;
     }
@@ -24,8 +24,9 @@ export default function CreateApplicationController(executable, events) {
 
 class ApplicationController {
 
-    constructor(executablePath, events) {
+    constructor(executablePath, args, events) {
         this.eventCallbacks = events || {};
+        this.executableArgs = args;
 
         this.spawn = this.spawn.bind(this);
         this.spawnProcess = this.spawnProcess.bind(this);
@@ -50,13 +51,13 @@ class ApplicationController {
         throw new Error("NotImplemented: spawn()");
     }
 
-    spawnProcess(filePath) {
-        this.subprocess = this.doSpawnProcess(filePath);
+    spawnProcess(filePath, args = []) {
+        this.subprocess = this.doSpawnProcess(filePath, args);
         this.subscribeToProcess();
     }
 
-    doSpawnProcess(filePath) {
-        return spawn(filePath, [], { cwd: this.executableInfo.dir, env: process.env });
+    doSpawnProcess(filePath, args = []) {
+        return spawn(filePath, args, { cwd: this.executableInfo.dir, env: process.env });
     }
 
     subscribeToProcess() {
@@ -90,7 +91,7 @@ class APWindows extends ApplicationController {
 
     spawn() {
         console.log("Preparing to launch", this.executableInfo.name);
-        this.spawnProcess(path.win32.normalize(`${this.executableInfo.dir}/${this.executableInfo.base}`));
+        this.spawnProcess(path.win32.normalize(`${this.executableInfo.dir}/${this.executableInfo.base}`), this.executableArgs);
         console.log("Launched", this.executableInfo.name);
     }
 
@@ -102,7 +103,7 @@ class APMac extends ApplicationController {
         // https://ourcodeworld.com/articles/read/154/how-to-execute-an-exe-file-system-application-using-electron-framework
         // https://stackoverflow.com/questions/27688804/how-do-i-debug-error-spawn-enoent-on-node-js
         console.log("Preparing to launch", this.executableInfo.name);
-        this.spawnProcess(`${this.executableInfo.dir}/${this.executableInfo.base}/Contents/MacOS/${this.executableInfo.name}`);
+        this.spawnProcess(`${this.executableInfo.dir}/${this.executableInfo.base}/Contents/MacOS/${this.executableInfo.name}`, this.executableArgs);
         console.log("Launched", this.executableInfo.name);
     }
 

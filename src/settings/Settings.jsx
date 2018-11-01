@@ -160,7 +160,7 @@ export class Settings extends React.Component {
 
     revokeSnapshot(otherOptions) {
         otherOptions.snapshot = undefined;
-        this.setState(otherOptions, () => console.log(this.state.snapshot));
+        this.setState(otherOptions);
     }
 
     handleOpen() {

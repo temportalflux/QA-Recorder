@@ -20,6 +20,11 @@ export const SettingsModuleApplication = (props) => {
                 />
             </Form.Field>
 
+            <Form.Field disabled={props.shouldBeDisabled()}>
+                <label>Executable Cmd Arguments</label>
+                <InputSaved path={`${props.path}.executableArgs`} />
+            </Form.Field>
+
         </div>
     );
 };

@@ -80,9 +80,6 @@ export class AppModuleLauncher extends React.Component {
         // TODO: disable setting editting while app is active
 
         this.obs = new OBSInterface(GetLocalData().get('settings.obs.executable'));
-        this.target = CreateApplicationController(GetLocalData().get('settings.application.executable'), {
-            close: this.onTargetClose,
-        });
 
         // GOTTA IMPORT THOSE ASSETS
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.LOADING_OBS_SETTINGS_FILES);
@@ -93,6 +90,21 @@ export class AppModuleLauncher extends React.Component {
 
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.LOADING_OBS_SETTINGS);
         await this.obs.loadFromSettings();
+
+        let executable = GetLocalData().get('settings.application.executable');
+        let args = [];
+        let argStr = GetLocalData().get(Settings.getDataPath('application.executableArgs'), "");
+        if (argStr) args = argStr.split(' ');
+        args = args.map((arg) => {
+            return Settings.formatString(arg)
+                .replace(Settings.getRegexForKey('outputDir'), this.obsOutputDirectory)
+                .replace(Settings.getRegexForKey('recordingFilename'), path.basename(this.obsOutputDirectory || ""))
+                ;
+        });
+        console.log(`Launching application ${executable} with args`, args);
+        this.target = CreateApplicationController(executable, args, {
+            close: this.onTargetClose,
+        });
 
         AppModuleLauncher.setStatus(LAUNCHER_STATUS.LAUNCHING_TARGET);
         await this.target.spawn();

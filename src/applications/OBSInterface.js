@@ -49,7 +49,7 @@ export default class OBSInterface {
         this.startStreaming = this.startStreaming.bind(this);
         this.stopStreaming = this.stopStreaming.bind(this);
 
-        this.processController = CreateApplicationController(location, name);
+        this.processController = CreateApplicationController(location, [], name);
         this.connection = new OBSWebSocket();
         this.filenameFormatted = undefined;
     }
