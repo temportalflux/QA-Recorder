@@ -106,7 +106,8 @@ export default class OBSInterface {
         {
             for (const filePath of filePaths.values())
             {
-                if (FileSystem.exists(filePath))
+                let exists = await FileSystem.exists(filePath);
+                if (exists)
                 {
                     console.log(`Removing file ${filePath}`);
                     await FileSystem.remove(filePath);
