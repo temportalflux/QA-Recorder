@@ -297,7 +297,8 @@ export default class OBSInterface {
         {
             for (const filePath of filePaths.values())
             {
-                if (FileSystem.exists(filePath))
+                let exists = await FileSystem.exists(filePath);
+                if (exists)
                 {
                     let newFilePath = path.join(outputDir, path.parse(filePath).base);
                     console.log(`Moving file ${filePath} to ${newFilePath}`);
