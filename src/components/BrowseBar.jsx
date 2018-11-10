@@ -32,24 +32,32 @@ export default class BrowseBar extends React.Component {
 
     async _handleBrowse() {
         let currentValue = GetLocalData().get(this.props.path);
-        let startLocation = currentValue ? FileSystem.resolvePotentialRelative(currentValue) : FileSystem.appData();
+        let startLocation = currentValue && typeof(currentValue) === 'string' ? FileSystem.resolvePotentialRelative(currentValue) : FileSystem.appData();
         let options = lodash.defaults(this.props.options, {
             title: 'Executable File',
-            defaultPath: startLocation,
+            defaultPath: path.parse(startLocation ? startLocation : '').dir,
             properties: ['openFile'],
         });
         if (this.props.filters !== undefined) {
             options.filters = this.props.filters;
         }
+        console.log(options);
         let filePaths = await FileSystem.displayDialog(options);
         if (filePaths !== undefined && Array.isArray(filePaths) && filePaths.length > 0) {
-            this._setPath(filePaths[0], this.state.isRelative);
+            this.props.parsePaths(filePaths, this.state.isRelative,
+                (value) => {
+                    this.setState({ value: value });
+                    GetLocalData().set(`${this.props.path}.path`, value);
+                }, this._setPath);
         }
     }
 
     _handleToggleRelative(e, {checked}) {
         if (checked !== this.state.isRelative) {
-            this._setPath(this.state.value, checked);
+            this.parsePaths(this.state.value, checked, (value) => {
+                this.setState({ value: value });
+                GetLocalData().set(`${this.props.path}.path`, value);
+            }, this._setPath);
             GetLocalData().set(`${this.props.path}.isRelative`, checked);
         }
         this.setState({
@@ -93,6 +101,7 @@ export default class BrowseBar extends React.Component {
 BrowseBar.defaultProps = {
     options: {},
     filters: [],
+    parsePaths: (paths, isRelative, setValue, defaultSetPath) => defaultSetPath(paths[0], isRelative),
 };
 
 BrowseBar.propTypes = {
@@ -109,4 +118,5 @@ BrowseBar.propTypes = {
      * The initial path
      */
     path: PropTypes.string.isRequired,
+    parsePaths: PropTypes.func,
 };

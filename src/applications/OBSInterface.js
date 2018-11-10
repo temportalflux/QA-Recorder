@@ -19,7 +19,10 @@ export default class OBSInterface {
         this.addFileSettings = this.addFileSettings.bind(this);
         this.cleanup = this.cleanup.bind(this);
         this.moveOutputFile = this.moveOutputFile.bind(this);
+        this.moveDataFiles = this.moveDataFiles.bind(this);
+        this.getDataFilePaths = this.getDataFilePaths.bind(this);
 
+        this.removeOldDataFiles = this.removeOldDataFiles.bind(this);
         this.addFileSettingsProfile = this.addFileSettingsProfile.bind(this);
         this.removeFileSettingsProfile = this.removeFileSettingsProfile.bind(this);
         this.getProfilePathSet = this.getProfilePathSet.bind(this);
@@ -69,12 +72,17 @@ export default class OBSInterface {
     async addFileSettings() {
         await this.addFileSettingsProfile();
         await this.addFileSettingsScenes();
+        await this.removeOldDataFiles();
     }
 
     async cleanup() {
         await this.removeFileSettingsProfile();
         await this.removeFileSettingsScenes();
         await this.moveOutputFile();
+        await this.moveDataFiles();
+
+        GetEvents().dispatch(EVENT_LIST.NOTIFY_OBS_UNSET_OUTPUT_DIR);
+        this.filenameFormatted = undefined;
     }
 
     async addFileSettingsProfile() {
@@ -90,6 +98,21 @@ export default class OBSInterface {
         if (set === undefined) return;
         let { profilePathSrc, profilePathDirDest, profilePathDest } = set;
         await FileSystem.remove(profilePathDirDest);
+    }
+
+    async removeOldDataFiles() {
+        let filePaths = this.getDataFilePaths();
+        if (filePaths.length > 0)
+        {
+            for (const filePath of filePaths.values())
+            {
+                if (FileSystem.exists(filePath))
+                {
+                    console.log(`Removing file ${filePath}`);
+                    await FileSystem.remove(filePath);
+                }
+            }
+        }
     }
 
     getProfilePathSet() {
@@ -261,8 +284,27 @@ export default class OBSInterface {
             console.log(e);
             console.error(e);
         }
-        GetEvents().dispatch(EVENT_LIST.NOTIFY_OBS_UNSET_OUTPUT_DIR);
-        this.filenameFormatted = undefined;
+    }
+
+    getDataFilePaths() {
+        return GetLocalData().get(`settings.record.recordedData`, {path: ''}).path.split(";");
+    }
+
+    async moveDataFiles() {
+        let outputDir = this.getRecordingOutputDirectory();
+        let filePaths = this.getDataFilePaths();
+        if (filePaths.length > 0)
+        {
+            for (const filePath of filePaths.values())
+            {
+                if (FileSystem.exists(filePath))
+                {
+                    let newFilePath = path.join(outputDir, path.parse(filePath).base);
+                    console.log(`Moving file ${filePath} to ${newFilePath}`);
+                    await FileSystem.rename(filePath, newFilePath);
+                }
+            }
+        }
     }
 
     async loadFromSettingsStream() {

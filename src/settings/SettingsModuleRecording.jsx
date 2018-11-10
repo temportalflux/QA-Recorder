@@ -7,6 +7,9 @@ import InputSaved from "../components/InputSaved";
 import * as shortid from "shortid";
 import AccordionStateful from "../components/AccordionStateful";
 import {FILENAME_FORMATS} from "./Settings";
+import {GetLocalData} from "../singletons/LocalData";
+import FileSystem from "../singletons/FileSystem";
+import path from 'path';
 
 function createTable(header, content) {
     let mapToCells = (items) => {
@@ -37,6 +40,8 @@ function createTable(header, content) {
 }
 
 export const SettingsModuleRecording = (props) => {
+    let executable = GetLocalData().get('settings.application.executable', {});
+    executable = Object.getOwnPropertyNames(executable).length > 0 ? FileSystem.resolvePlatformPath(executable): "";
     return (
         <div>
 
@@ -85,6 +90,23 @@ export const SettingsModuleRecording = (props) => {
                         }, [])
                     )}
                 </AccordionStateful>
+            </Form.Field>
+
+            <Form.Field disabled={props.shouldBeDisabled()}>
+                <label>Data to copy (separate by semicolon ';')</label>
+                <BrowseBar
+                    path={`${props.path}.recordedData`}
+                    options={{
+                        title: 'File and folders to save',
+                        defaultPath: executable.length > 0 ? path.parse(executable).dir : FileSystem.desktop(),
+                        properties: [
+                            'openDirectory',
+                            'multiSelections',
+                        ],
+                    }}
+                    parsePaths={(paths, isRelative, setValue) => setValue(paths.join(';'))}
+
+                />
             </Form.Field>
 
         </div>
