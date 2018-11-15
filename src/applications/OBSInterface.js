@@ -296,6 +296,7 @@ export default class OBSInterface {
         let filePaths = this.getDataFilePaths();
         if (filePaths.length > 0)
         {
+            console.log(filePaths);
             for (const filePath of filePaths.values())
             {
                 console.log(`Looking for file ${filePath}`);
