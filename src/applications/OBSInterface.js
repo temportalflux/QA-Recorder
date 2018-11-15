@@ -79,6 +79,10 @@ export default class OBSInterface {
         await this.removeFileSettingsProfile();
         await this.removeFileSettingsScenes();
         await this.moveOutputFile();
+
+        await new Promise(resolve => {
+            setTimeout(() => resolve(), 2 * 1000);
+        });
         await this.moveDataFiles();
 
         GetEvents().dispatch(EVENT_LIST.NOTIFY_OBS_UNSET_OUTPUT_DIR);
