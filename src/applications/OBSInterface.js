@@ -298,7 +298,9 @@ export default class OBSInterface {
         {
             for (const filePath of filePaths.values())
             {
+                console.log(`Looking for file ${filePath}`);
                 let exists = await FileSystem.exists(filePath);
+                console.log(`Did I find file ${filePath}? ${exists}`);
                 if (exists)
                 {
                     let newFilePath = path.join(outputDir, path.parse(filePath).base);
