@@ -79,10 +79,6 @@ export default class OBSInterface {
         await this.removeFileSettingsProfile();
         await this.removeFileSettingsScenes();
         await this.moveOutputFile();
-
-        await new Promise(resolve => {
-            setTimeout(() => resolve(), 2 * 1000);
-        });
         await this.moveDataFiles();
 
         GetEvents().dispatch(EVENT_LIST.NOTIFY_OBS_UNSET_OUTPUT_DIR);
@@ -300,17 +296,23 @@ export default class OBSInterface {
         let filePaths = this.getDataFilePaths();
         if (filePaths.length > 0)
         {
-            console.log(filePaths);
+            let execPathObj = GetLocalData().get('settings.application.executable', {});
+            let appPath = FileSystem.resolvePlatformPath(execPathObj);
+            let appExecBasePath = path.parse(appPath).dir;
+            //console.log(execPathObj, appPath, appExecBasePath);
+
+            //console.log(filePaths);
             for (const filePath of filePaths.values())
             {
-                console.log(`Looking for file ${filePath}`);
-                let exists = await FileSystem.exists(filePath);
-                console.log(`Did I find file ${filePath}? ${exists}`);
+                let relFilePath = path.join(appExecBasePath, filePath);
+                console.log(`Looking for file ${relFilePath}`);
+                let exists = await FileSystem.exists(relFilePath);
+                //console.log(`Did I find file ${relFilePath}? ${exists}`);
                 if (exists)
                 {
-                    let newFilePath = path.join(outputDir, path.parse(filePath).base);
-                    console.log(`Moving file ${filePath} to ${newFilePath}`);
-                    await FileSystem.rename(filePath, newFilePath);
+                    let newFilePath = path.join(outputDir, path.parse(relFilePath).base);
+                    console.log(`Moving file ${relFilePath} to ${newFilePath}`);
+                    await FileSystem.rename(relFilePath, newFilePath);
                 }
             }
         }
