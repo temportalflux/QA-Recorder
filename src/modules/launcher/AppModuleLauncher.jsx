@@ -78,6 +78,7 @@ export class AppModuleLauncher extends React.Component {
 
     async launch() {
         // TODO: disable setting editting while app is active
+        let systemTimeStart = new Date().getTime();
 
         this.obs = new OBSInterface(GetLocalData().get('settings.obs.executable'));
 
@@ -97,8 +98,10 @@ export class AppModuleLauncher extends React.Component {
         if (argStr) args = argStr.split(' ');
         args = args.map((arg) => {
             return Settings.formatString(arg)
-                .replace(Settings.getRegexForKey('outputDir'), this.obsOutputDirectory).replace(/\\/g, "/")
+                .replace(Settings.getRegexForKey('outputDir'), this.obsOutputDirectory)
+                .replace(/\\/g, "/")
                 .replace(Settings.getRegexForKey('recordingFilename'), path.basename(this.obsOutputDirectory || ""))
+                .replace(Settings.getRegexForKey('systemTimeStart'), systemTimeStart)
                 ;
         });
         console.log(`Launching application ${executable} with args`, args);

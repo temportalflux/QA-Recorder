@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Player} from 'video-react';
-import TimestampDisplayBar from './TimestampDisplayBar';
+import TimestampDisplayBar, {TIMESTAMP_DEFAULT_DURATION} from './TimestampDisplayBar';
 import ControlBar from "./monkeypatch/ControlBar";
 import {Header, Message, Segment} from "semantic-ui-react";
 import moment from "moment";
@@ -132,8 +132,20 @@ export default class Viewer extends React.Component {
 
     getTimestampsFor(time) {
         return lodash.filter(this.props.timestamps, (timestamp) => {
-            return timestamp.start <= time && (timestamp.end !== undefined ? timestamp.end : timestamp.duration + timestamp.start) >= time;
+            const duration = timestamp.duration !== undefined ? timestamp.duration : TIMESTAMP_DEFAULT_DURATION;
+            return timestamp.start <= time &&
+                (timestamp.end !== undefined ? timestamp.end : timestamp.start + duration) >= time;
         });
+    }
+
+    static formatMs(ms) {
+        let seconds = Math.floor(ms / 1000);
+        let minutes = Math.floor(seconds / 60);
+        let hours = Math.floor(minutes / 60);
+        minutes -= hours * 60;
+        seconds -= minutes * 60;
+        ms -= seconds * 1000;
+        return `${hours}:${minutes}:${seconds}:${ms}`;
     }
 
     render() {
@@ -160,9 +172,10 @@ export default class Viewer extends React.Component {
                     {timestamps.length <= 0 && <p>No comments at this timestamp.</p>}
                     {timestamps.map((timestamp) => {
                         let start = timestamp.start;
-                        let end = timestamp.end !== undefined ? timestamp.end : (timestamp.duration + start);
-                        start = moment(start).format('HH:mm:ss');
-                        end = moment(end).format('HH:mm:ss');
+                        let duration = timestamp.duration !== undefined ? timestamp.duration : TIMESTAMP_DEFAULT_DURATION;
+                        let end = timestamp.end !== undefined ? timestamp.end : start + duration;
+                        start = Viewer.formatMs(start);//moment(start).format('HH:mm:ss');
+                        end = Viewer.formatMs(end);//moment(end).format('HH:mm:ss');
                         return (
                             <div key={shortid.generate()}>
                                 <Header>{start} - {end}</Header>
@@ -195,11 +208,13 @@ Viewer.propTypes = {
     timestamps: PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.shape({
             start: PropTypes.number.isRequired,
-            end: PropTypes.number.isRequired,
+            end: PropTypes.number,
+            comment: PropTypes.string,
         }),
         PropTypes.shape({
             start: PropTypes.number.isRequired,
-            duration: PropTypes.number.isRequired,
+            duration: PropTypes.number,
+            comment: PropTypes.string,
         }),
     ])),
 };

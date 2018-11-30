@@ -1,6 +1,8 @@
 import React from 'react';
 import * as shortid from 'shortid';
 
+export const TIMESTAMP_DEFAULT_DURATION = 100;
+
 export default class TimestampDisplayBar extends React.Component {
 
     // TODO: L-Click bar seeks video to that timestamp
@@ -42,7 +44,8 @@ export default class TimestampDisplayBar extends React.Component {
     _recompileBookmarks() {
         return this._getTimestamps().map((timestamp) => {
             let start = timestamp.start / this._getTotalTime();
-            let end = timestamp.end !== undefined ? timestamp.end : timestamp.start + timestamp.duration;
+            let duration = timestamp.duration !== undefined ? timestamp.duration : TIMESTAMP_DEFAULT_DURATION;
+            let end = timestamp.end !== undefined ? timestamp.end : timestamp.start + duration;
             end /= this._getTotalTime();
             return { start: start, end: end, };
         });

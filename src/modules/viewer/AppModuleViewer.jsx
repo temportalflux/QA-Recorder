@@ -87,9 +87,11 @@ export class AppModuleViewer extends React.Component {
         if (contents.hasOwnProperty('bookmarks'))
         {
             let pathBookmarks = path.resolve(fullPath, contents['bookmarks']);
+            console.log(`Loading bookmarks from ${pathBookmarks}`);
             let bookmarksExist = await FileSystem.exists(pathBookmarks);
             if (bookmarksExist) {
                 timestamps = await FileSystem.readFile(pathBookmarks);
+                console.log(`Bookmarks:`, timestamps);
                 timestamps = JSON.parse(timestamps);
             }
         }
